@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { PlayerModule } from './player/player.module';
@@ -15,7 +13,5 @@ import { DataMapModule } from './services/datamap/data-map.module';
     PlayerModule,
     DataMapModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
