@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Player, PlayerDocument } from '../../player/schema/player.schema';
@@ -34,6 +34,7 @@ export class DataMapService {
         height: playerData.height,
         weight: playerData.weight,
         dateOfBirth: playerData.date_of_birth,
+        statistics: [],
       });
       await player.save();
     }
@@ -63,13 +64,13 @@ export class DataMapService {
       goalsConceded:
         stat.details.find((d: any) => d.type_id === 88)?.value?.total || 0,
       cleanSheets:
-        stat.details.find((d: any) => d.type_id === 324)?.value?.total || 0,
+        stat.details.find((d: any) => d.type_id === 194)?.value?.total || 0,
       cleanSheetsHome:
-        stat.details.find((d: any) => d.type_id === 324)?.value?.home || 0,
+        stat.details.find((d: any) => d.type_id === 194)?.value?.home || 0,
       cleanSheetsAway:
-        stat.details.find((d: any) => d.type_id === 324)?.value?.away || 0,
+        stat.details.find((d: any) => d.type_id === 194)?.value?.away || 0,
       ownGoals:
-        stat.details.find((d: any) => d.type_id === 105)?.value?.total || 0,
+        stat.details.find((d: any) => d.type_id === 324)?.value?.total || 0,
     }));
 
     for (const stat of statisticsData) {
@@ -79,9 +80,27 @@ export class DataMapService {
       });
 
       if (existingStat) {
-        await existingStat.updateOne(stat);
+        const updatedStat = await existingStat.updateOne(stat);
+        if (!updatedStat) {
+          throw new HttpException('Failed to update player statistics', 400);
+        }
+
+        await player.updateOne({
+          $push: {
+            statistics: updatedStat._id,
+          },
+        });
       } else {
-        await this.statisticsModel.create(stat);
+        const newStat = await this.statisticsModel.create(stat);
+        if (!newStat) {
+          throw new HttpException('Failed to create player statistics', 400);
+        }
+
+        await player.updateOne({
+          $push: {
+            statistics: newStat._id,
+          },
+        });
       }
     }
 
