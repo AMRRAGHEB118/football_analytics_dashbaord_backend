@@ -1,13 +1,14 @@
-// src/services/data-import.service.ts
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { AxiosService } from '../axios/axios.service';
 import { ConfigService } from '@nestjs/config';
+import { DataMapService } from '../datamap/data-map.service';
 
 @Injectable()
 export class DataImportService {
   constructor(
     private readonly axiosService: AxiosService,
     private readonly configService: ConfigService,
+    private readonly dataMapService: DataMapService,
   ) {}
 
   async getPlayerData(playerId: number, session: string): Promise<any> {
@@ -30,9 +31,15 @@ export class DataImportService {
   async importPlayerData(playerId: number): Promise<void> {
     const sessions = this.configService.get<string>('SESSIONS').split(',');
     for (const session of sessions) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const playerData = await this.getPlayerData(playerId, session);
-      //TODO: Implement the logic to send data to your data map service
+      try {
+        const playerData = await this.getPlayerData(playerId, session);
+        await this.dataMapService.mapAndSavePlayerData(playerData);
+      } catch (error) {
+        console.error(
+          `Failed to import data for player ${playerId} in session ${session}`,
+          error,
+        );
+      }
     }
     return Promise.resolve();
   }
