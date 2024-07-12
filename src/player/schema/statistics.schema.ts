@@ -1,12 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 export type StatisticsDocument = HydratedDocument<Statistics>;
 
 @Schema({ timestamps: true })
 export class Statistics {
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Player', required: true })
+  playerId: MongooseSchema.Types.ObjectId;
+
   @Prop({ required: true })
-  sessionId: string;
+  sessionId: number;
 
   @Prop()
   totalGoals: number;

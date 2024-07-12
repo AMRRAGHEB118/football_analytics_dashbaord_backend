@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { Statistics, StatisticsSchema } from './statistics.schema';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { Statistics } from './statistics.schema';
 
 export type PlayerDocument = HydratedDocument<Player>;
 
@@ -13,16 +13,10 @@ export class Player {
   teamId: number;
 
   @Prop()
-  country: number;
+  position: string;
 
   @Prop()
-  nationality: number;
-
-  @Prop()
-  position: number;
-
-  @Prop()
-  detailedPosition: number;
+  detailedPosition: string;
 
   @Prop()
   commonName: string;
@@ -51,7 +45,10 @@ export class Player {
   @Prop()
   dateOfBirth: string;
 
-  @Prop({ type: [StatisticsSchema], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Statistics' }],
+    default: [],
+  })
   statistics: Statistics[];
 }
 

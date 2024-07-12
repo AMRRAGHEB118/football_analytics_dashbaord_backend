@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AxiosModule } from './services/axios/axios.module';
 import { PlayerModule } from './player/player.module';
+import { DataMapService } from './services/datamap/data-map.service';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { PlayerModule } from './player/player.module';
     PlayerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, DataMapService],
 })
 export class AppModule {}
