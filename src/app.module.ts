@@ -7,7 +7,9 @@ import { DataMapModule } from './services/datamap/data-map.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MongooseModule.forRoot(process.env.MONGODB_URL),
     AxiosModule,
     PlayerModule,

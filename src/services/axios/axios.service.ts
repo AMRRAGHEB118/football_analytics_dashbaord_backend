@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 
 @Injectable()
 export class AxiosService {
   private readonly axiosInstance: AxiosInstance;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.axiosInstance = axios.create({
-      baseURL: process.env.FOOTBALL_API,
+      baseURL: this.configService.get<string>('FOOTBALL_API'),
       headers: {
         'Content-Type': 'application/json',
       },

@@ -13,8 +13,7 @@ export class DataImportService {
 
   async getPlayerData(playerId: number, session: string): Promise<any> {
     const apiToken = this.configService.get<string>('API_KEY');
-    const baseUrl = this.configService.get<string>('FOOTBALL_API');
-    const url = `${baseUrl}/players/${playerId}?api_token=${apiToken}&include=metadata;position;detailedPosition;statistics.details.type;&filters=playerStatisticSeasons:${session}`;
+    const url = `/players/${playerId}?api_token=${apiToken}&include=metadata;position;detailedPosition;statistics.details.type;&filters=playerStatisticSeasons:${session}`;
 
     try {
       const response = await this.axiosService.instance.get(url);
