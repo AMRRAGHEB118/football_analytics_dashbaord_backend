@@ -11,9 +11,9 @@ export class DataImportService {
     private readonly dataMapService: DataMapService,
   ) {}
 
-  async getPlayerData(playerId: number, session: string): Promise<any> {
+  async getPlayerData(playerId: number, season: string): Promise<any> {
     const apiToken = this.configService.get<string>('API_KEY');
-    const url = `/players/${playerId}?api_token=${apiToken}&include=metadata;position;detailedPosition;statistics.details.type;&filters=playerStatisticSeasons:${session}`;
+    const url = `/players/${playerId}?api_token=${apiToken}&include=metadata;position;detailedPosition;statistics.details.type;&filters=playerStatisticSeasons:${season}`;
 
     try {
       const response = await this.axiosService.instance.get(url);
@@ -28,14 +28,14 @@ export class DataImportService {
   }
 
   async importPlayerData(playerId: number): Promise<void> {
-    const sessions = this.configService.get<string>('SESSIONS').split(',');
-    for (const session of sessions) {
+    const seasons = this.configService.get<string>('SEASONS').split(',');
+    for (const season of seasons) {
       try {
-        const playerData = await this.getPlayerData(playerId, session);
+        const playerData = await this.getPlayerData(playerId, season);
         await this.dataMapService.mapAndSavePlayerData(playerData);
       } catch (error) {
         console.error(
-          `Failed to import data for player ${playerId} in session ${session}`,
+          `Failed to import data for player ${playerId} in season ${season}`,
           error,
         );
       }
