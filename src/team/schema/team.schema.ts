@@ -18,16 +18,17 @@ export class Team {
   @Prop()
   founded: number;
 
-  @Prop({ required: true })
-  players: [{
-    playerId: number;
-  }];
-
-  @Prop({ required: true })
+  @Prop({
+    type: [{
+      id: { type: Number, required: true },
+      seasonId: { type: Number, required: true }
+    }],
+  })
   statistics: [{
     id: number;
     seasonId: number;
   }]
 }
 
+export type TeamDocument = Team & Document;
 export const TeamSchema = SchemaFactory.createForClass(Team);
