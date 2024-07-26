@@ -15,4 +15,8 @@ export class ContactUsService {
     const createdContactUs = new this.contactUsModel(createContactUsDto);
     return createdContactUs.save();
   }
+
+  async findAll(): Promise<ContactUs[]> {
+    return this.contactUsModel.find().exec();
+  }
 }

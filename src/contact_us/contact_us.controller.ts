@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { ContactUsService } from './contact_us.service';
 import { CreateContactUsDto } from './create_contact_us.dto';
 import { ContactUs } from './contact_us.schema';
@@ -12,5 +12,10 @@ export class ContactUsController {
     @Body() createContactUsDto: CreateContactUsDto,
   ): Promise<ContactUs> {
     return this.contactUsService.create(createContactUsDto);
+  }
+
+  @Get()
+  async findAll(): Promise<ContactUs[]> {
+    return this.contactUsService.findAll();
   }
 }
