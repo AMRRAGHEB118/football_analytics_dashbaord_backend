@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 
 @Schema()
@@ -99,5 +99,5 @@ export class TeamStatistics {
   failedToScore: number
 }
 
-export type TeamStatDocument = TeamStatistics & Document;
+export type TeamStatDocument = HydratedDocument<TeamStatistics>;
 export const TeamStatSchema = SchemaFactory.createForClass(TeamStatistics);

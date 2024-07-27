@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { TeamStatistics } from './teamStats.schema';
-import { Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class Team {
@@ -23,5 +23,5 @@ export class Team {
   statistics: TeamStatistics[];
 }
 
-export type TeamDocument = Team & Document;
+export type TeamDocument = HydratedDocument<Team>;
 export const TeamSchema = SchemaFactory.createForClass(Team);
