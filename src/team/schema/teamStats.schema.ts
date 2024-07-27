@@ -4,15 +4,11 @@ import { Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class TeamStatistics {
-
-  @Prop({ unique: true, required: true })
-  id: number;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Team', required: true })
+  teamId: MongooseSchema.Types.ObjectId;
 
   @Prop({ required: true })
   seasonId: number;
-
-  @Prop({ required: true })
-  teamId: number;
 
   @Prop({
     type: MongooseSchema.Types.Mixed,

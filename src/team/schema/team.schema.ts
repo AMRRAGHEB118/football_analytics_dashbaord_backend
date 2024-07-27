@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
+import { TeamStatistics } from './teamStats.schema';
+import { Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class Team {
@@ -15,19 +16,11 @@ export class Team {
   @Prop()
   imgPath: string;
 
-  @Prop()
-  founded: number;
-
   @Prop({
-    type: [{
-      id: { type: Number, required: true },
-      seasonId: { type: Number, required: true }
-    }],
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'TeamStatistics' }],
+    default: [],
   })
-  statistics: [{
-    id: number;
-    seasonId: number;
-  }]
+  statistics: TeamStatistics[];
 }
 
 export type TeamDocument = Team & Document;
