@@ -88,6 +88,12 @@ export class TeamStatistics {
 
   @Prop()
   drawAway: number;
+  
+  @Prop()
+  winHome: number;
+  
+  @Prop()
+  winAway: number;
 
   @Prop()
   corners: number;
