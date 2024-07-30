@@ -13,41 +13,77 @@ export class TeamStatistics {
   @Prop({
     type: MongooseSchema.Types.Mixed,
     default: {
-      "0-15": 0,
-      "15-30": 0,
-      "30-45": 0,
-      "45-60": 0,
-      "60-75": 0,
-      "75-90": 0,
+      "0-15": {
+        "count": 0,
+        "percentage": 0,
+      },
+      "15-30": {
+        "count": 0,
+        "percentage": 0
+      },
+      "30-45": {
+        "count": 0,
+        "percentage": 0
+      },
+      "45-60": {
+        "count": 0,
+        "percentage": 0
+      },
+      "60-75": {
+        "count": 0,
+        "percentage": 0
+      },
+      "75-90": {
+        "count": 0,
+        "percentage": 0
+      },
     },
   })
   scoringTiming: {
-    "0-15": number,
-    "15-30": number,
-    "30-45": number,
-    "45-60": number,
-    "60-75": number,
-    "75-90": number,
+    "0-15": MongooseSchema.Types.Mixed,
+    "15-30": MongooseSchema.Types.Mixed,
+    "30-45": MongooseSchema.Types.Mixed,
+    "45-60": MongooseSchema.Types.Mixed,
+    "60-75": MongooseSchema.Types.Mixed,
+    "75-90": MongooseSchema.Types.Mixed,
   };
 
   @Prop({
     type: MongooseSchema.Types.Mixed,
     default: {
-      "0-15": 0,
-      "15-30": 0,
-      "30-45": 0,
-      "45-60": 0,
-      "60-75": 0,
-      "75-90": 0,
+      "0-15": {
+        "count": 0,
+        "percentage": 0,
+      },
+      "15-30": {
+        "count": 0,
+        "percentage": 0,
+      },
+      "30-45": {
+        "count": 0,
+        "percentage": 0,
+      },
+      "45-60": {
+        "count": 0,
+        "percentage": 0,
+      },
+      "60-75": {
+        "count": 0,
+        "percentage": 0,
+      },
+      "75-90": {
+        "count": 0,
+        "percentage": 0,
+      },
     },
   })
   goalsConcededTiming: {
-    "0-15": number,
-    "15-30": number,
-    "30-45": number,
-    "45-60": number,
-    "60-75": number,
-    "75-90": number,
+    "0-15": MongooseSchema.Types.Mixed,
+    "15-30": MongooseSchema.Types.Mixed,
+    "30-45": MongooseSchema.Types.Mixed,
+    "45-60": MongooseSchema.Types.Mixed,
+    "60-75": MongooseSchema.Types.Mixed,
+    "75-90": MongooseSchema.Types.Mixed,
   };
 
   @Prop()
