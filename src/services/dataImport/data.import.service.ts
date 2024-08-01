@@ -9,7 +9,7 @@ export class DataImportService {
     private readonly axiosService: AxiosService,
     private readonly configService: ConfigService,
     private readonly dataMapService: DataMapService,
-  ) {}
+  ) { }
 
   async getPlayerData(playerId: number, season: string): Promise<any> {
     const apiToken = this.configService.get<string>('API_KEY');
@@ -19,7 +19,6 @@ export class DataImportService {
       const response = await this.axiosService.instance.get(url);
       return response.data;
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Failed to fetch player data',
         HttpStatus.BAD_REQUEST,
@@ -41,5 +40,19 @@ export class DataImportService {
       }
     }
     return Promise.resolve();
+  }
+
+  async importTeam(teamId: number): Promise<any> {
+    const apiToken = this.configService.get<string>('API_KEY');
+    const seasons = this.configService.get<string>('SEASONS');
+    const url = `/teams/${teamId}?api_token=${apiToken}&include=statistics.details.type&filters=playerStatisticSeasons:${seasons}`;
+    try {
+      const team = await this.axiosService.instance.get(url);
+      if (!team.data?.data?.id) throw new HttpException('Team Not Found', HttpStatus.NOT_FOUND);
+      const savedTeam = await this.dataMapService.mapAndSaveTeamData(team.data);
+      return savedTeam;
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
