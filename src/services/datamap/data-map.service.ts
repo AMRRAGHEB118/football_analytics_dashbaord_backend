@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model} from 'mongoose';
+import { Model } from 'mongoose';
 import { Player, PlayerDocument } from '../../player/schema/player.schema';
 import { Team, TeamDocument } from 'src/team/schema/team.schema';
 import { TeamStatDocument, TeamStatistics } from 'src/team/schema/teamStats.schema';
@@ -115,13 +115,6 @@ export class DataMapService {
     const teamData = apiData.data;
     const mongoTeam = await this.teamModel.findOne({ id: teamData.id }).exec();
 
-    mongoTeam.name = teamData.name; 
-    mongoTeam.shortCode = teamData.short_code;
-    mongoTeam.imgPath = teamData.image_path;
-    mongoTeam.statistics = [];
-
-    await this.teamStat.deleteMany({})
-    
     if (teamData.statistics.length === 0) {
       return mongoTeam;
     }
@@ -157,16 +150,35 @@ export class DataMapService {
           }
         }
       });
+    for (const stat of teamStatData) {
+      const existingStat = await this.teamStat.findOne({
+        teamId: mongoTeam._id,
+        seasonId: stat.seasonId,
+      });
 
-    const stats = await Promise.all(teamStatData.map(async (stat: any) => {
-      try {
+      if (existingStat) {
+        const updatedStat = await existingStat.updateOne(stat);
+        if (!updatedStat) {
+          throw new HttpException('Failed to update player statistics', 400);
+        }
+        await mongoTeam.updateOne({
+          $push: {
+            statistics: updatedStat._id,
+          },
+        });
+      } else {
         const newStat = await this.teamStat.create(stat);
-        return newStat._id;
-      } catch (error) {
-        console.error('Error creating teamStat:', error);
+        if (!newStat) {
+          throw new HttpException('Failed to create player statistics', 400);
+        }
+
+        await mongoTeam.updateOne({
+          $push: {
+            statistics: newStat._id,
+          },
+        });
       }
-    }));
-    mongoTeam.statistics = stats;
-    return await this.teamModel.findByIdAndUpdate(mongoTeam._id, mongoTeam, { new:true }).exec();
+    }
+    return await this.teamModel.findById(mongoTeam._id).exec();
   }
 }
