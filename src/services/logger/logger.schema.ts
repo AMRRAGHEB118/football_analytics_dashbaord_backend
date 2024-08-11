@@ -36,13 +36,10 @@ export class Logger {
   @Prop({ required: true, default: LoggerType.INFO })
   type: LoggerType;
 
-  @Prop({ required: false })
+  @Prop()
   responseTime?: number;
 
-  @Prop({ required: false })
-  correlationId?: string;
-
-  @Prop({ required: false })
+  @Prop()
   ipAddress?: string;
 
   @Prop({ type: Object, required: false })
@@ -53,6 +50,7 @@ export class Logger {
 
   @Prop({ required: false, default: false })
   isAutomated?: boolean;
+  createdAt: any;
 }
 
 export const LoggerSchema = SchemaFactory.createForClass(Logger);
