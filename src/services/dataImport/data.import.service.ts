@@ -2,6 +2,8 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { AxiosService } from '../axios/axios.service';
 import { ConfigService } from '@nestjs/config';
 import { DataMapService } from '../datamap/data-map.service';
+import { Team } from 'src/team/schema/team.schema';
+
 
 @Injectable()
 export class DataImportService {
@@ -45,7 +47,7 @@ export class DataImportService {
   async importTeam(teamId: number): Promise<any> {
     const apiToken = this.configService.get<string>('API_KEY');
     const seasons = this.configService.get<string>('SEASONS');
-    const url = `/teams/${teamId}?api_token=${apiToken}&include=statistics.details.type&filters=playerStatisticSeasons:${seasons}`;
+    const url = `/teams/${teamId}?api_token=${apiToken}&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
     try {
       const team = await this.axiosService.instance.get(url);
       if (!team.data?.data?.id) throw new HttpException('Team Not Found', HttpStatus.NOT_FOUND);
@@ -53,6 +55,21 @@ export class DataImportService {
       return savedTeam;
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  async fetchAllTeams(): Promise<Team[]> {
+    const apiToken = this.configService.get<string>('API_KEY');
+    const seasons = this.configService.get<string>('SEASONS');
+    const url = `/teams/countries/1161?api_token=${apiToken}&per_page=50&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
+    try {
+      const teams = await this.axiosService.instance.get(url);
+      const mappedTeams = await Promise.all(teams.data.data.map(async (team: object) => {
+        return this.dataMapService.mapAndSaveTeamData(team);
+      }));
+      console.log(mappedTeams);
+      return mappedTeams;
+    } catch (error) {
     }
   }
 }

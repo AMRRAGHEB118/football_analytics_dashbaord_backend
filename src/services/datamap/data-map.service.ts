@@ -111,9 +111,53 @@ export class DataMapService {
     return Promise.resolve();
   }
 
+  // teamStatMap(statData: object[]): object[] {
+  //   const seasons = this.configService.get<string>('SEASONS').split(',');
+  //   return statData
+  //   .filter((stat: any) => seasons.includes(String(stat.season_id)))
+  //   .map((stat: any) => {
+  //     if (this.configService.get<string>('SEASONS').split(',').includes(String(stat.season_id))) {
+  //       return {
+  //         teamId: mongoTeam._id,
+  //         seasonId: stat.season_id,
+  //         scoringTiming: stat.details.find((d: any) => d.type_id === 196)?.value,
+  //         goalsConcededTiming: stat.details.find((d: any) => d.type_id === 213)?.value,
+  //         goalsScoredHome: stat.details.find((d: any) => d.type_id === 52)?.value?.home?.count,
+  //         goalsScoredAway: stat.details.find((d: any) => d.type_id === 52)?.value?.away?.count,
+  //         totalGoalsScored: stat.details.find((d: any) => d.type_id === 52)?.value?.all?.count,
+  //         goalsConcededHome: stat.details.find((d: any) => d.type_id === 88)?.value?.home?.count,
+  //         goalsConcededAway: stat.details.find((d: any) => d.type_id === 88)?.value?.away?.count,
+  //         totalGoalsConceded: stat.details.find((d: any) => d.type_id === 88)?.value?.all?.count,
+  //         yellowCards: stat.details.find((d: any) => d.type_id === 84)?.value?.count,
+  //         redCards: stat.details.find((d: any) => d.type_id === 83)?.value?.count,
+  //         ballPossession: stat.details.find((d: any) => d.type_id === 45)?.value?.average,
+  //         lostHome: stat.details.find((d: any) => d.type_id === 216)?.value?.home?.count,
+  //         lostAway: stat.details.find((d: any) => d.type_id === 216)?.value?.away?.count,
+  //         winHome: stat.details.find((d: any) => d.type_id === 214)?.value?.home?.count,
+  //         winAway: stat.details.find((d: any) => d.type_id === 214)?.value?.away?.count,
+  //         drawHome: stat.details.find((d: any) => d.type_id === 215)?.value?.home?.count,
+  //         drawAway: stat.details.find((d: any) => d.type_id === 215)?.value?.away?.count,
+  //         corners: stat.details.find((d: any) => d.type_id === 34)?.value?.count,
+  //         cleanSheets: stat.details.find((d: any) => d.type_id === 194)?.value?.all?.count,
+  //         failedToScore: stat.details.find((d: any) => d.type_id === 575)?.value?.all?.count,
+  //       }
+  //     }
+  //   });
+  // } 
+
   async mapAndSaveTeamData(apiData: any): Promise<Team> {
-    const teamData = apiData.data;
-    const mongoTeam = await this.teamModel.findOne({ id: teamData.id }).exec();
+    const teamData = apiData?.data ? apiData.data : apiData;
+    let mongoTeam: any = await this.teamModel.findOne({ id: teamData.id }).exec();
+
+    if (!mongoTeam) {
+      mongoTeam = new this.teamModel({
+        id: teamData.id,
+        name: teamData.name,
+        shortCode: teamData.short_code,
+        imgPath: teamData.image_path,
+      });
+      await mongoTeam.save();
+    }
 
     if (teamData.statistics.length === 0) {
       return mongoTeam;
@@ -123,7 +167,8 @@ export class DataMapService {
     const teamStatData = teamData.statistics
       .filter((stat: any) => seasons.includes(String(stat.season_id)))
       .map((stat: any) => {
-        if (this.configService.get<string>('SEASONS').split(',').includes(String(stat.season_id))) {
+        // if (this.configService.get<string>('SEASONS').split(',').includes(String(stat.season_id)))
+        {
           return {
             teamId: mongoTeam._id,
             seasonId: stat.season_id,
