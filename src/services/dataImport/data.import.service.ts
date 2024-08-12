@@ -67,7 +67,6 @@ export class DataImportService {
       const mappedTeams = await Promise.all(teams.data.data.map(async (team: object) => {
         return this.dataMapService.mapAndSaveTeamData(team);
       }));
-      console.log(mappedTeams);
       return mappedTeams;
     } catch (error) {
     }
