@@ -51,8 +51,8 @@ export class TeamService {
         "data": teams,
       }
     else return {
-      "message": "Team not found ,Please make sure of the id",
-      "status": 404,
+      "message": "Error happened while fetching please try again",
+      "status": 500,
       "data": teams,
     }
   }
