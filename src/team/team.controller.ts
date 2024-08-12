@@ -17,4 +17,9 @@ export class TeamController {
   reloadTeam(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
     return this.teamService.reloadTeam(id);
   }
+
+  @Get()
+  fetchAll() {
+    return this.teamService.fetchAllTeams();
+  }
 }

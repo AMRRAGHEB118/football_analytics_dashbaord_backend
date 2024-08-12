@@ -42,4 +42,18 @@ export class TeamService {
     }
   }
 
+  async fetchAllTeams() {
+    const teams = await this.dataImport.fetchAllTeams();
+    if (teams)
+      return {
+        "message": "Teams fetched successfully",
+        "status": 200,
+        "data": teams,
+      }
+    else return {
+      "message": "Team not found ,Please make sure of the id",
+      "status": 404,
+      "data": teams,
+    }
+  }
 }
