@@ -42,4 +42,18 @@ export class TeamService {
     }
   }
 
+  async fetchAllTeams() {
+    const teams = await this.dataImport.fetchAllTeams();
+    if (teams)
+      return {
+        "message": "Teams fetched successfully",
+        "status": 200,
+        "data": teams,
+      }
+    else return {
+      "message": "Error happened while fetching please try again",
+      "status": 500,
+      "data": teams,
+    }
+  }
 }
