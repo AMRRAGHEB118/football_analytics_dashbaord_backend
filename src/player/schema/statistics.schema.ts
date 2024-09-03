@@ -9,7 +9,7 @@ export class Statistics {
   playerId: MongooseSchema.Types.ObjectId;
 
   @Prop({ required: true })
-  sessionId: number;
+  seasonId: number;
 
   @Prop()
   totalGoals: number;

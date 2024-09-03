@@ -2,6 +2,9 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { AxiosService } from '../axios/axios.service';
 import { ConfigService } from '@nestjs/config';
 import { DataMapService } from '../datamap/data-map.service';
+import { Team } from 'src/team/schema/team.schema';
+import { Season } from 'src/season/schema/season.schema';
+
 
 @Injectable()
 export class DataImportService {
@@ -41,5 +44,58 @@ export class DataImportService {
       }
     }
     return Promise.resolve();
+  }
+
+  async importTeam(teamId: number): Promise<any> {
+    const apiToken = this.configService.get<string>('API_KEY');
+    const seasons = this.configService.get<string>('SEASONS');
+    const url = `/teams/${teamId}?api_token=${apiToken}&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
+    try {
+      const team = await this.axiosService.instance.get(url);
+      if (!team.data?.data?.id) throw new HttpException('Team Not Found', HttpStatus.NOT_FOUND);
+      const savedTeam = await this.dataMapService.mapAndSaveTeamData(team.data);
+      return savedTeam;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async fetchAllTeams(): Promise<Team[]> {
+    const apiToken = this.configService.get<string>('API_KEY');
+    const seasons = this.configService.get<string>('SEASONS');
+    const url = `/teams/countries/1161?api_token=${apiToken}&per_page=50&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
+    try {
+      const teams = await this.axiosService.instance.get(url);
+      const mappedTeams = await Promise.all(teams.data.data.map(async (team: object) => {
+        const mapped_team = await this.dataMapService.mapAndSaveTeamData(team);
+        return mapped_team || null
+      })).then(results => results.filter(team => team !== null));
+      return mappedTeams;
+    } catch (error) {
+    }
+  }
+
+  async fetchSeasons(): Promise<Season[] | string> {
+    const SEASONS = ["2020/2021", "2021/2022", "2022/2023"];
+    const LEAGUE_ID = "501"
+    const API_TOKEN = this.configService.get<string>('API_KEY');
+    const URL = `https://api.sportmonks.com/v3/football/seasons?api_token=
+    ${API_TOKEN}&&include=league;teams&filters=seasonLeagues:${LEAGUE_ID}`
+
+    try {
+      let seasons = (await this.axiosService.instance.get(URL)).data.data;
+      seasons = seasons.filter((season) => SEASONS.includes(season.name));
+      const mappedSeasons = await Promise.all(seasons.map(async (season) => {
+        try {
+          return await this.dataMapService.mapOnSeasons(season);
+        } catch (error) {
+          throw error;
+        }
+      }));
+      return mappedSeasons;
+    } catch (error) {
+      console.error('Failed to fetch and map seasons:', error);
+      throw new Error('Failed to fetch seasons');
+    }
   }
 }

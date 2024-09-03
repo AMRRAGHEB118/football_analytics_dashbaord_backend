@@ -6,17 +6,22 @@ import { AxiosModule } from './services/axios/axios.module';
 import { DataMapModule } from './services/datamap/data-map.module';
 import { ContactUsModule } from './contact_us/contact_us.module';
 import { APP_PIPE } from '@nestjs/core';
+import { TeamModule } from './team/team.module';
+import { SeasonModule } from './season/season.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    // MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forRoot("mongodb://localhost:27017"),
     AxiosModule,
     PlayerModule,
     DataMapModule,
     ContactUsModule,
+    TeamModule,
+    SeasonModule
   ],
   providers: [
     {
