@@ -2,6 +2,8 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Player, PlayerDocument } from '../../player/schema/player.schema';
+import { Team, TeamDocument } from 'src/team/schema/team.schema';
+import { TeamStatDocument, TeamStatistics } from 'src/team/schema/teamStats.schema';
 import {
   Statistics,
   StatisticsDocument,
@@ -49,7 +51,7 @@ export class DataMapService {
 
     const statisticsData = playerData.statistics.map((stat: any) => ({
       playerId: player._id,
-      sessionId: stat.season_id,
+      seasonId: stat.season_id,
       totalGoals:
         stat.details.find((d: any) => d.type_id === 52)?.value?.total || 0,
       goals: stat.details.find((d: any) => d.type_id === 52)?.value?.goals || 0,
@@ -84,7 +86,7 @@ export class DataMapService {
     for (const stat of statisticsData) {
       const existingStat = await this.statisticsModel.findOne({
         playerId: player._id,
-        sessionId: stat.sessionId,
+        seasonId: stat.seasonId,
       });
 
       if (existingStat) {
@@ -111,7 +113,6 @@ export class DataMapService {
         });
       }
     }
-
     return Promise.resolve();
   }
 

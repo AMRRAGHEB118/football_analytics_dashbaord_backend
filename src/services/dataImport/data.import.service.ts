@@ -22,7 +22,6 @@ export class DataImportService {
       const response = await this.axiosService.instance.get(url);
       return response.data;
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Failed to fetch player data',
         HttpStatus.BAD_REQUEST,
