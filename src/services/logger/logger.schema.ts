@@ -50,7 +50,6 @@ export class Logger {
 
   @Prop({ required: false, default: false })
   isAutomated?: boolean;
-  createdAt: any;
 }
 
 export const LoggerSchema = SchemaFactory.createForClass(Logger);
