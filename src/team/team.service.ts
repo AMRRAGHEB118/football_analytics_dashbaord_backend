@@ -3,57 +3,27 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Team } from './schema/team.schema';
 import { Model } from 'mongoose';
 import { DataImportService } from 'src/services/dataImport/data.import.service';
+import { LoggerService } from 'src/services/logger/logger.service';
+
+
 
 @Injectable()
 export class TeamService {
   constructor(@InjectModel(Team.name) private teamModel: Model<Team>,
-    private readonly dataImport: DataImportService) { }
+    private readonly dataImport: DataImportService,
+    private readonly loggerService: LoggerService
+  ) { }
 
   async findOne(id: number, seasonId: number) {
-    const team = await this.teamModel.findOne({ id })
+    return await this.teamModel.findOne({ id })
       .populate({ path: 'statistics', match: { seasonId: seasonId } }).exec();
-
-    if (!team) {
-      return {
-        "message": "Team Not Found!",
-        "status": 404,
-        "data": []
-      }
-    }
-    return {
-      "message": "Team returned successfully",
-      "status": 200,
-      "data": [team]
-    };
   }
 
   async reloadTeam(id: number) {
-    const reloadedTeam = await this.dataImport.importTeam(id);
-    if (reloadedTeam)
-      return {
-        "message": "Team reloaded successfully",
-        "status": 200,
-        "data": [reloadedTeam],
-      }
-    else return {
-      "message": "Team not found ,Please make sure of the id",
-      "status": 404,
-      "data": [reloadedTeam],
-    }
+    return this.dataImport.importTeam(id)
   }
 
   async fetchAllTeams() {
-    const teams = await this.dataImport.fetchAllTeams();
-    if (teams)
-      return {
-        "message": "Teams fetched successfully",
-        "status": 200,
-        "data": { teams },
-      }
-    else return {
-      "message": "Error happened while fetching please try again",
-      "status": 500,
-      "data": { 'teams': [] },
-    }
+    return await this.dataImport.fetchAllTeams();
   }
 }
