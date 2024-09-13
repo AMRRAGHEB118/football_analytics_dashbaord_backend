@@ -10,8 +10,6 @@ import {
 } from '../../player/schema/statistics.schema';
 import { ConfigService } from '@nestjs/config';
 import { Season, SeasonDocment } from 'src/season/schema/season.schema';
-import { TeamStatDocument, TeamStatistics } from 'src/team/schema/teamStats.schema';
-import { Team, TeamDocument } from 'src/team/schema/team.schema';
 
 
 @Injectable()
@@ -48,7 +46,6 @@ export class DataMapService {
       });
       await player.save();
     }
-
     const statisticsData = playerData.statistics.map((stat: any) => ({
       playerId: player._id,
       seasonId: stat.season_id,
