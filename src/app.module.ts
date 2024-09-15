@@ -14,8 +14,7 @@ import { SeasonModule } from './season/season.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // MongooseModule.forRoot(process.env.MONGODB_URL),
-    MongooseModule.forRoot("mongodb://localhost:27017"),
+    MongooseModule.forRoot(process.env.MONGODB_URL),
     AxiosModule,
     PlayerModule,
     DataMapModule,
