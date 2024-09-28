@@ -1,9 +1,16 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AxiosService } from '../axios/axios.service';
 import { ConfigService } from '@nestjs/config';
 import { DataMapService } from '../datamap/data-map.service';
-import { Team } from 'src/team/schema/team.schema';
+import { LoggerService } from '../logger/logger.service';
+import { LoggerModule } from '../logger/logger.schema';
 
+
+type Response = {
+  "err": string,
+  "status_code": number,
+  "data": any,
+}
 
 @Injectable()
 export class DataImportService {
@@ -11,65 +18,175 @@ export class DataImportService {
     private readonly axiosService: AxiosService,
     private readonly configService: ConfigService,
     private readonly dataMapService: DataMapService,
-  ) {}
+    private readonly logger: LoggerService
+  ) {
+  }
 
-  async getPlayerData(playerId: number, season: string): Promise<any> {
+
+  async getPlayerData(playerId: number, season: string): Promise<Response> {
     const apiToken = this.configService.get<string>('API_KEY');
-    const url = `/players/${playerId}?api_token=${apiToken}&include=metadata;position;detailedPosition;statistics.details.type;&filters=playerStatisticSeasons:${season}`;
+    const url =
+      `/players/${playerId}?api_token=${apiToken}` +
+      `&include=metadata;position;detailedPosition;` +
+      `statistics.details.type;&filters=playerStatisticSeasons:${season}`;
 
     try {
       const response = await this.axiosService.instance.get(url);
-      return response.data;
+      if (!response?.data) {
+        this.logger.logError(
+          `Player ${playerId} data for season ${season} Not Found!`,
+          '/team:id', 'GET', 404, LoggerModule.PLAYER
+        );
+        return {
+          "err": "",
+          "status_code": 404,
+          "data": null
+        };
+      };
+      return {
+        "err": "",
+        "status_code": 200,
+        "data": response.data
+      };
     } catch (error) {
-      throw new HttpException(
-        'Failed to fetch player data',
-        HttpStatus.BAD_REQUEST,
-      );
+      this.logger.logError(
+        `Failed to fetch player ${playerId} data for season ${season}`,
+        '/player:id',
+        'GET', 500, LoggerModule.PLAYER, error);
+      return {
+        "err": error,
+        "status_code": 500,
+        "data": null
+      };
     }
   }
 
-  async importPlayerData(playerId: number): Promise<void> {
+  async importPlayerData(playerId: number): Promise<Response> {
     const seasons = this.configService.get<string>('SEASONS').split(',');
     for (const season of seasons) {
       try {
         const playerData = await this.getPlayerData(playerId, season);
-        await this.dataMapService.mapAndSavePlayerData(playerData);
+        const result = await this.dataMapService.mapAndSavePlayerData(playerData);
+        return {
+          "err": "",
+          "status_code": 200,
+          "data": result,
+        }
       } catch (error) {
-        console.error(
-          `Failed to import data for player ${playerId} in season ${season}`,
-          error,
-        );
+        this.logger.logError
+          (
+            `Failed to import data for player ${playerId}`,
+            '/player:id', 'GET', 500, LoggerModule.PLAYER, error
+          );
+        return {
+          "err": error,
+          "status_code": 500,
+          "data": null,
+        }
       }
     }
-    return Promise.resolve();
   }
 
-  async importTeam(teamId: number): Promise<any> {
+  async importTeam(teamId: number): Promise<Response> {
     const apiToken = this.configService.get<string>('API_KEY');
     const seasons = this.configService.get<string>('SEASONS');
-    const url = `/teams/${teamId}?api_token=${apiToken}&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
+    const url =
+      `/teams/${teamId}?api_token=${apiToken}&include=statistics.details.type` +
+      `&filters=teamstatisticSeasons:${seasons}`;
+
     try {
       const team = await this.axiosService.instance.get(url);
-      if (!team.data?.data?.id)
-        throw new HttpException('Team Not Found', HttpStatus.NOT_FOUND);
+      if (!team.data?.data?.id) {
+        return {
+          "err": "",
+          "status_code": 404,
+          "data": null
+        };
+      };
       const savedTeam = await this.dataMapService.mapAndSaveTeamData(team.data);
-      return savedTeam;
+      return {
+        "err": "",
+        "status_code": 200,
+        "data": savedTeam
+      };
     } catch (error) {
-      console.error(error);
+      return {
+        "err": error,
+        "status_code": 500,
+        "data": null
+      }
     }
   }
 
-  async fetchAllTeams(): Promise<Team[]> {
+  async fetchAllTeams(): Promise<Response> {
     const apiToken = this.configService.get<string>('API_KEY');
     const seasons = this.configService.get<string>('SEASONS');
-    const url = `/teams/countries/1161?api_token=${apiToken}&per_page=50&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
+    const url =
+      `/teams/countries/1161?api_token=${apiToken}&per_page=50` +
+      `&include=statistics.details.type&filters=teamstatisticSeasons:${seasons}`;
+
     try {
       const teams = await this.axiosService.instance.get(url);
-      const mappedTeams = await Promise.all(teams.data.data.map(async (team: object) => {
-        return this.dataMapService.mapAndSaveTeamData(team);
-      }));
-      return mappedTeams;
+      const mappedTeams =
+        await Promise.all
+          (
+            teams.data.data.map(async (team: object) => {
+              const mapped_team = await this.dataMapService.mapAndSaveTeamData(team);
+              return mapped_team || null
+            })
+          ).then(results => results.filter(team => team !== null));
+
+      return {
+        "err": "",
+        "status_code": 200,
+        "data": mappedTeams,
+      }
     } catch (error) {
+      return {
+        "err": error,
+        "status_code": 500,
+        "data": null
+      }
+    }
+  }
+
+  async fetchSeasons(): Promise<Response> {
+    const SEASONS = ["2020/2021", "2021/2022", "2022/2023"];
+    const LEAGUE_ID = "501"
+    const API_TOKEN = this.configService.get<string>('API_KEY');
+    const URL =
+      `https://api.sportmonks.com/v3/football/seasons?api_token=` +
+      `${API_TOKEN}&&include=league;teams&filters=seasonLeagues:${LEAGUE_ID}`;
+
+    try {
+      const seasons = ((await this.axiosService.instance.get(URL)).data.data)
+        .filter((season) => SEASONS.includes(season.name));
+
+      const mappedSeasons = await Promise.all
+        (
+          seasons.map(async (season: any) => {
+            try {
+              return await this.dataMapService.mapOnSeasons(season);
+            } catch (error) {
+              this.logger.logError
+                (
+                  `Error while mapping on season ${season}`,
+                  '/season', 'GET', 500, LoggerModule.SEASON, error
+                );
+            }
+          })
+        );
+      return {
+        "err": "",
+        "status_code": 200,
+        "data": mappedSeasons
+      };
+    } catch (error) {
+      return {
+        "err": error,
+        "status_code": 500,
+        "data": null
+      };
     }
   }
 }
