@@ -32,7 +32,6 @@ export class PlayerController {
 
     try {
       const result = await this.playerService.findOne(id);
-
       if (result.status_code == 200) {
         this.loggerService.logInfo
           (
@@ -65,7 +64,6 @@ export class PlayerController {
             }
           );
       }
-      console.log(result);
       throw new HttpException(result.msg, 500)
     } catch (error) {
       this.loggerService.logError
@@ -79,7 +77,7 @@ export class PlayerController {
           {
             "message": `Server error happened while finding player ${id}`,
             "status_code": 500,
-            "data": []
+            "data": [],
           }
         );
     }
