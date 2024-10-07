@@ -25,14 +25,13 @@ export class DataMapService {
 
   async mapAndSavePlayerData(apiData: any): Promise<void> {
     const playerData = apiData.data;
-
     let player = await this.playerModel.findOne({ id: playerData.id });
     if (!player) {
       player = new this.playerModel({
         id: playerData.id,
         teamId: playerData.team_id,
-        position: playerData.position.name,
-        detailedPosition: playerData.detailedposition.name,
+        position: playerData.position?.name,
+        detailedPosition: playerData.detailedposition?.name,
         commonName: playerData.common_name,
         firstName: playerData.firstname,
         lastName: playerData.lastname,
