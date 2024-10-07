@@ -175,4 +175,250 @@ export class TeamController {
     }
 
   }
+
+  @Get('statistics/top-score/:seasonId')
+  async getTopScorerOfSeason(
+    @Param('seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    seasonId: number) {
+    try {
+      const result = await this.teamService.getTopScorerOfSeason(seasonId);
+
+      if (!result || result.length === 0) {
+        this.loggerService.logError
+          (
+            `No statistics found for season: ${seasonId}`,
+            "team/statistics/top-of-season/:seasonId",
+            "GET", 404, LoggerModule.TEAM
+          );
+        return {
+          "message": "No statistics found for this season!",
+          "status": 404,
+          "data": [],
+        };
+      };
+      this.loggerService.logInfo
+        (
+          `Statistics retieved successfully for season: ${seasonId}`,
+          "team/statistics/top-of-season/:seasonId",
+          "GET", 500, LoggerModule.TEAM
+        )
+
+      return {
+        "message": "Top socorer teams retrieved successfully",
+        "status": 200,
+        "data": result
+      };
+    } catch (error) {
+      this.loggerService.logError
+        (
+          `Server Error happened while finding statistics for season: ${seasonId}`,
+          "team/statistics/top-of-season/:seasonId",
+          "GET", 500, LoggerModule.TEAM, error
+        );
+      return {
+        "message": "Server Error happened",
+        "status": 500,
+        "data": [],
+      };
+    }
+  }
+
+  @Get('statistics/failed-to-score/:seasonId')
+  async getMostFailedToScore(
+    @Param('seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    seasonId: number) {
+    try {
+      const result = await this.teamService.getMostFailedToScore(seasonId);
+
+      if (!result || result.length === 0) {
+        this.loggerService.logError
+          (
+            `No statistics found for season: ${seasonId}`,
+            "team/statistics/failed-to-score/:seasonId",
+            "GET", 404, LoggerModule.TEAM
+          );
+        return {
+          "message": "No statistics found for this season!",
+          "status": 404,
+          "data": [],
+        };
+      };
+      this.loggerService.logInfo
+        (
+          `Statistics retieved successfully for season: ${seasonId}`,
+          "team/statistics/failed-to-score/:seasonId",
+          "GET", 500, LoggerModule.TEAM
+        )
+
+      return {
+        "message": "Failed to score teams retrieved successfully",
+        "status": 200,
+        "data": result
+      };
+    } catch (error) {
+      this.loggerService.logError
+        (
+          `Server Error happened while finding statistics for season: ${seasonId}`,
+          "team/statistics/failed-to-score/:seasonId",
+          "GET", 500, LoggerModule.TEAM, error
+        );
+      return {
+        "message": "Server Error happened",
+        "status": 500,
+        "data": [],
+      };
+    }
+  }
+
+  @Get('statistics/most-possessed/:seasonId')
+  async getMostPosessed(
+    @Param('seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    seasonId: number) {
+    try {
+      const result = await this.teamService.getMostPossessed(seasonId);
+
+      if (!result || result.length === 0) {
+        this.loggerService.logError
+          (
+            `No statistics found for season: ${seasonId}`,
+            "team/statistics/most-possessed/:seasonId",
+            "GET", 404, LoggerModule.TEAM
+          );
+        return {
+          "message": "No statistics found for this season!",
+          "status": 404,
+          "data": [],
+        };
+      };
+      this.loggerService.logInfo
+        (
+          `Statistics retieved successfully for season: ${seasonId}`,
+          "team/statistics/most-possessed/:seasonId",
+          "GET", 500, LoggerModule.TEAM
+        )
+
+      return {
+        "message": "Most possessed teams retrieved successfully",
+        "status": 200,
+        "data": result
+      };
+    } catch (error) {
+      this.loggerService.logError
+        (
+          `Server Error happened while finding statistics for season: ${seasonId}`,
+          "team/statistics/most-possessed/:seasonId",
+          "GET", 500, LoggerModule.TEAM, error
+        );
+      return {
+        "message": "Server Error happened",
+        "status": 500,
+        "data": [],
+      };
+    }
+  }
+
+  @Get('statistics/score-of-period/:seasonId/:period')
+  async getTopScorersOfPeriod(
+    @Param('seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    seasonId: number,
+    @Param('period',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    period: number) {
+    try {
+      const result = await this.teamService.getTopScorersOfPeriod(seasonId, period);
+
+      if (!result || result.length === 0) {
+        this.loggerService.logError
+          (
+            `No statistics found for season: ${seasonId}`,
+            "team/statistics/score-of-period/:seasonId",
+            "GET", 404, LoggerModule.TEAM
+          );
+        return {
+          "message": "No statistics found for this season!",
+          "status": 404,
+          "data": [],
+        };
+      };
+      this.loggerService.logInfo
+        (
+          `Statistics retieved successfully for season: ${seasonId}`,
+          "team/statistics/score-of-period/:seasonId",
+          "GET", 500, LoggerModule.TEAM
+        )
+
+      return {
+        "message": "Scoring periods of teams retrieved successfully",
+        "status": 200,
+        "data": result
+      };
+    } catch (error) {
+      this.loggerService.logError
+        (
+          `Server Error happened while finding statistics for season: ${seasonId}`,
+          "team/statistics/score-of-period/:seasonId",
+          "GET", 500, LoggerModule.TEAM, error
+        );
+      return {
+        "message": "Server Error happened",
+        "status": 500,
+        "data": [],
+      };
+    }
+  }
+
+  @Get('statistics/conceded-of-period/:seasonId/:period')
+  async getMostScoredAtOfPeriod(
+    @Param('seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    seasonId: number,
+    @Param('period',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    period: number) {
+    try {
+      const result = await this.teamService.getMostScoredAtOfPeriod(seasonId, period);
+
+      if (!result || result.length === 0) {
+        this.loggerService.logError
+          (
+            `No statistics found for season: ${seasonId}`,
+            "team/statistics/conceded-of-period/:seasonId",
+            "GET", 404, LoggerModule.TEAM
+          );
+        return {
+          "message": "No statistics found for this season!",
+          "status": 404,
+          "data": [],
+        };
+      };
+      this.loggerService.logInfo
+        (
+          `Statistics retieved successfully for season: ${seasonId}`,
+          "team/statistics/conceded-of-period/:seasonId",
+          "GET", 500, LoggerModule.TEAM
+        )
+
+      return {
+        "message": "Goals conceded periods of teams retrieved successfully",
+        "status": 200,
+        "data": result
+      };
+    } catch (error) {
+      this.loggerService.logError
+        (
+          `Server Error happened while finding statistics for season: ${seasonId}`,
+          "team/statistics/conceded-of-period/:seasonId",
+          "GET", 500, LoggerModule.TEAM, error
+        );
+      return {
+        "message": "Server Error happened",
+        "status": 500,
+        "data": [],
+      };
+    }
+  }
 }
