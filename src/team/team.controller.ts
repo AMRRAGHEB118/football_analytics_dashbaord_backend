@@ -14,7 +14,6 @@ import { LoggerModule } from 'src/services/logger/logger.schema';
 import { Response } from 'express';
 
 
-
 @Controller('team')
 export class TeamController {
   constructor(private teamService: TeamService,
@@ -180,7 +179,8 @@ export class TeamController {
   async getTopScorerOfSeason(
     @Param('seasonId',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
-    seasonId: number) {
+    seasonId: number,
+    @Res() response: Response) {
     try {
       const result = await this.teamService.getTopScorerOfSeason(seasonId);
 
@@ -191,11 +191,11 @@ export class TeamController {
             "team/statistics/top-of-season/:seasonId",
             "GET", 404, LoggerModule.TEAM
           );
-        return {
+        return response.status(404).send({
           "message": "No statistics found for this season!",
           "status": 404,
           "data": [],
-        };
+        });
       };
       this.loggerService.logInfo
         (
@@ -204,11 +204,11 @@ export class TeamController {
           "GET", 500, LoggerModule.TEAM
         )
 
-      return {
+      return response.status(200).send({
         "message": "Top socorer teams retrieved successfully",
         "status": 200,
         "data": result
-      };
+      });
     } catch (error) {
       this.loggerService.logError
         (
@@ -216,11 +216,11 @@ export class TeamController {
           "team/statistics/top-of-season/:seasonId",
           "GET", 500, LoggerModule.TEAM, error
         );
-      return {
+      return response.status(500).send({
         "message": "Server Error happened",
         "status": 500,
         "data": [],
-      };
+      });
     }
   }
 
@@ -228,7 +228,8 @@ export class TeamController {
   async getMostFailedToScore(
     @Param('seasonId',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
-    seasonId: number) {
+    seasonId: number,
+    @Res() response: Response) {
     try {
       const result = await this.teamService.getMostFailedToScore(seasonId);
 
@@ -239,11 +240,11 @@ export class TeamController {
             "team/statistics/failed-to-score/:seasonId",
             "GET", 404, LoggerModule.TEAM
           );
-        return {
+        return response.status(404).send({
           "message": "No statistics found for this season!",
           "status": 404,
           "data": [],
-        };
+        });
       };
       this.loggerService.logInfo
         (
@@ -252,11 +253,11 @@ export class TeamController {
           "GET", 500, LoggerModule.TEAM
         )
 
-      return {
+      return response.status(200).send({
         "message": "Failed to score teams retrieved successfully",
         "status": 200,
         "data": result
-      };
+      });
     } catch (error) {
       this.loggerService.logError
         (
@@ -264,11 +265,11 @@ export class TeamController {
           "team/statistics/failed-to-score/:seasonId",
           "GET", 500, LoggerModule.TEAM, error
         );
-      return {
+      return response.status(500).send({
         "message": "Server Error happened",
         "status": 500,
         "data": [],
-      };
+      });
     }
   }
 
@@ -276,7 +277,8 @@ export class TeamController {
   async getMostPosessed(
     @Param('seasonId',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
-    seasonId: number) {
+    seasonId: number,
+    @Res() response: Response) {
     try {
       const result = await this.teamService.getMostPossessed(seasonId);
 
@@ -287,11 +289,11 @@ export class TeamController {
             "team/statistics/most-possessed/:seasonId",
             "GET", 404, LoggerModule.TEAM
           );
-        return {
+        return response.status(404).send({
           "message": "No statistics found for this season!",
           "status": 404,
           "data": [],
-        };
+        });
       };
       this.loggerService.logInfo
         (
@@ -300,11 +302,11 @@ export class TeamController {
           "GET", 500, LoggerModule.TEAM
         )
 
-      return {
+      return response.status(200).send({
         "message": "Most possessed teams retrieved successfully",
         "status": 200,
         "data": result
-      };
+      });
     } catch (error) {
       this.loggerService.logError
         (
@@ -312,11 +314,11 @@ export class TeamController {
           "team/statistics/most-possessed/:seasonId",
           "GET", 500, LoggerModule.TEAM, error
         );
-      return {
+      return response.status(500).send({
         "message": "Server Error happened",
         "status": 500,
         "data": [],
-      };
+      });
     }
   }
 
@@ -327,7 +329,8 @@ export class TeamController {
     seasonId: number,
     @Param('period',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
-    period: number) {
+    period: number,
+    @Res() response: Response) {
     try {
       const result = await this.teamService.getTopScorersOfPeriod(seasonId, period);
 
@@ -338,11 +341,11 @@ export class TeamController {
             "team/statistics/score-of-period/:seasonId",
             "GET", 404, LoggerModule.TEAM
           );
-        return {
+        return response.status(404).send({
           "message": "No statistics found for this season!",
           "status": 404,
           "data": [],
-        };
+        });
       };
       this.loggerService.logInfo
         (
@@ -351,11 +354,11 @@ export class TeamController {
           "GET", 500, LoggerModule.TEAM
         )
 
-      return {
+      return response.status(200).send({
         "message": "Scoring periods of teams retrieved successfully",
         "status": 200,
         "data": result
-      };
+      });
     } catch (error) {
       this.loggerService.logError
         (
@@ -363,11 +366,11 @@ export class TeamController {
           "team/statistics/score-of-period/:seasonId",
           "GET", 500, LoggerModule.TEAM, error
         );
-      return {
+      return response.status(500).send({
         "message": "Server Error happened",
         "status": 500,
         "data": [],
-      };
+      });
     }
   }
 
@@ -378,7 +381,8 @@ export class TeamController {
     seasonId: number,
     @Param('period',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
-    period: number) {
+    period: number,
+    @Res() response: Response) {
     try {
       const result = await this.teamService.getMostScoredAtOfPeriod(seasonId, period);
 
@@ -389,24 +393,24 @@ export class TeamController {
             "team/statistics/conceded-of-period/:seasonId",
             "GET", 404, LoggerModule.TEAM
           );
-        return {
+        return response.status(404).send({
           "message": "No statistics found for this season!",
           "status": 404,
           "data": [],
-        };
+        });
       };
       this.loggerService.logInfo
         (
           `Statistics retieved successfully for season: ${seasonId}`,
           "team/statistics/conceded-of-period/:seasonId",
-          "GET", 500, LoggerModule.TEAM
+          "GET", 200, LoggerModule.TEAM
         )
 
-      return {
+      return response.status(200).send({
         "message": "Goals conceded periods of teams retrieved successfully",
         "status": 200,
         "data": result
-      };
+      });
     } catch (error) {
       this.loggerService.logError
         (
@@ -414,11 +418,11 @@ export class TeamController {
           "team/statistics/conceded-of-period/:seasonId",
           "GET", 500, LoggerModule.TEAM, error
         );
-      return {
+      return response.status(500).send({
         "message": "Server Error happened",
         "status": 500,
         "data": [],
-      };
+      });
     }
   }
 }

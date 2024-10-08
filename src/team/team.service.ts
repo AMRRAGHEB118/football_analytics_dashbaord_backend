@@ -7,7 +7,6 @@ import { LoggerService } from 'src/services/logger/logger.service';
 import { TeamStatistics } from './schema/teamStats.schema';
 
 
-
 @Injectable()
 export class TeamService {
   constructor(
@@ -39,11 +38,10 @@ export class TeamService {
           },
         },
         {
-          $group: {
-            _id: "$teamId",
-            totalGoalsScored: {
-              $avg: "$totalGoalsScored"
-            },
+          $project: {
+            teamId: 1,
+            totalGoalsScored: 1,
+            seasonId: 1
           }
         },
         {
@@ -51,10 +49,23 @@ export class TeamService {
             totalGoalsScored: -1,
           },
         },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "teamId",
+            foreignField: "_id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+            }
+        },
       ]
     );
 
-    return this.teamModel.populate(teams, { path: '_id' });
+    return teams;
   }
 
   async getMostFailedToScore(seasonId: number) {
@@ -66,11 +77,10 @@ export class TeamService {
           },
         },
         {
-          $group: {
-            _id: "$teamId",
-            failedToScore: {
-              $avg: "$failedToScore"
-            },
+          $project: {
+            teamId: 1,
+            failedToScore: 1,
+            seasonId: 1
           }
         },
         {
@@ -78,10 +88,26 @@ export class TeamService {
             failedToScore: -1,
           },
         },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "teamId",
+            foreignField: "_id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+          }
+        },
+        {
+          $limit: 5
+        }
       ]
     );
 
-    return this.teamModel.populate(teams, { path: '_id' });
+    return teams;
   }
 
   async getMostPossessed(seasonId: number) {
@@ -93,21 +119,33 @@ export class TeamService {
           },
         },
         {
-          $group: {
-            _id: "$teamId",
-            avgPossession: {
-              $avg: "$ballPossession"
-            },
+          $project: {
+            teamId: 1,
+						ballPossession: 1,
+            seasonId: 1
           }
         },
         {
           $sort: {
-            avgPossession: -1,
+            ballPossession: -1,
           },
         },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "teamId",
+            foreignField: "_id",
+            as: "team"
+          }
+        },
+  			{
+    			$unwind: {
+    			  path: "$team",
+    			  }
+  			}
       ]
     );
-    return this.teamModel.populate(teams, { path: '_id' });
+    return teams;
   }
 
   async getTopScorersOfPeriod(seasonId: number, period: number) {
@@ -120,6 +158,7 @@ export class TeamService {
       5: "60-75",
       6: "75-90",
     };
+    const selection = 'scoringTiming.'.concat(periods[period]).concat('.count')
 
     const teams = await this.statModel.aggregate(
       [
@@ -129,21 +168,34 @@ export class TeamService {
           },
         },
         {
-          $group: {
-            _id: "$teamId",
-            goalsScored: {
-              $max: '$scoringTiming.'.concat(periods[period]).concat('.count')
-            },
+          $project: {
+            _id: 1,
+            teamId: 1,
+            [selection]: 1,
+            seasonId: 1
           }
         },
         {
           $sort: {
-            goalsScored: -1,
+            [selection]: -1,
           },
         },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "teamId",
+            foreignField: "_id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+            }
+        }
       ]
     );
-    return this.teamModel.populate(teams, { path: '_id' });
+    return teams;
   }
 
 
@@ -158,6 +210,8 @@ export class TeamService {
       6: "75-90",
     };
 
+    const selection = 'goalsConcededTiming.'.concat(periods[period]).concat('.count')
+
     const teams = await this.statModel.aggregate(
       [
         {
@@ -166,20 +220,33 @@ export class TeamService {
           },
         },
         {
-          $group: {
-            _id: "$teamId",
-            goalsConceded: {
-              $max: '$goalsConcededTiming.'.concat(periods[period]).concat('.count')
-            },
+          $project: {
+            _id: 1,
+            teamId: 1,
+            [selection]: 1,
+            seasonId: 1
           }
         },
         {
           $sort: {
-            goalsConceded: -1,
+            [selection]: -1,
           },
         },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "teamId",
+            foreignField: "_id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+            }
+        }
       ]
     );
-    return this.teamModel.populate(teams, { path: '_id' });
+    return teams;
   }
 }
