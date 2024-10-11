@@ -4,9 +4,13 @@ import { ConfigService } from '@nestjs/config';
 import { DataMapService } from '../datamap/data-map.service';
 import { LoggerService } from '../logger/logger.service';
 import { LoggerModule } from '../logger/logger.schema';
+import { Team } from 'src/team/schema/team.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Player } from 'src/player/schema/player.schema';
 
 
-type Response = {
+type _Response = {
   "err": string,
   "status_code": number,
   "data": any,
@@ -18,12 +22,13 @@ export class DataImportService {
     private readonly axiosService: AxiosService,
     private readonly configService: ConfigService,
     private readonly dataMapService: DataMapService,
-    private readonly logger: LoggerService
+    private readonly logger: LoggerService,
+    @InjectModel(Team.name) private teamModel: Model<Team>
   ) {
   }
 
 
-  async getPlayerData(playerId: number, season: string): Promise<Response> {
+  async getPlayerData(playerId: number, season: string): Promise<_Response> {
     const apiToken = this.configService.get<string>('API_KEY');
     const url =
       `/players/${playerId}?api_token=${apiToken}` +
@@ -61,7 +66,44 @@ export class DataImportService {
     }
   }
 
-  async importPlayerData(playerId: number): Promise<Response> {
+  async getPlayersData(): Promise<_Response> {
+    const apiToken = this.configService.get<string>('API_KEY');
+    try {
+      const teams = await this.teamModel.find();
+      const result: Player[] = await Promise.all(teams.map(async team => {
+        const url = `squads/teams/${team.id}?api_token=${apiToken}` +
+          `&per_page=50&include=player.statistics.details.type` +
+          `;detailedPosition;position` +
+          `&filters=playerstatisticSeasons:18369,19735,21787`;
+        const response = (await this.axiosService.instance.get(url)).data;
+        await Promise.all(response.data.map(async player => {
+          const res = await this.dataMapService.mapAndSavePlayerData(player)
+          return res;
+        }))
+        return response.data
+      }));
+      if (result.length === 0) {
+        return {
+          err: 'No players found',
+          status_code: 404,
+          data: []
+        };
+      }
+      return {
+        err: null,
+        status_code: 200,
+        data: result
+      };
+    } catch (error) {
+      return {
+        err: error,
+        status_code: 500,
+        data: null,
+      }
+    }
+  }
+
+  async importPlayerData(playerId: number): Promise<_Response> {
     const seasons = this.configService.get<string>('SEASONS').split(',');
     for (const season of seasons) {
       try {
@@ -87,7 +129,7 @@ export class DataImportService {
     }
   }
 
-  async importTeam(teamId: number): Promise<Response> {
+  async importTeam(teamId: number): Promise<_Response> {
     const apiToken = this.configService.get<string>('API_KEY');
     const seasons = this.configService.get<string>('SEASONS');
     const url =
@@ -118,7 +160,7 @@ export class DataImportService {
     }
   }
 
-  async fetchAllTeams(): Promise<Response> {
+  async fetchAllTeams(): Promise<_Response> {
     const apiToken = this.configService.get<string>('API_KEY');
     const seasons = this.configService.get<string>('SEASONS');
     const url =
@@ -150,7 +192,7 @@ export class DataImportService {
     }
   }
 
-  async fetchSeasons(): Promise<Response> {
+  async fetchSeasons(): Promise<_Response> {
     const SEASONS = ["2020/2021", "2021/2022", "2022/2023"];
     const LEAGUE_ID = "501"
     const API_TOKEN = this.configService.get<string>('API_KEY');
