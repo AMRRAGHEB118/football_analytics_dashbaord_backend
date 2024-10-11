@@ -158,7 +158,7 @@ export class TeamService {
       5: "60-75",
       6: "75-90",
     };
-    const selection = 'scoringTiming.'.concat(periods[period]).concat('.count')
+    const selection = '$scoringTiming.'.concat(periods[period]).concat('.count')
 
     const teams = await this.statModel.aggregate(
       [
@@ -171,13 +171,13 @@ export class TeamService {
           $project: {
             _id: 1,
             teamId: 1,
-            [selection]: 1,
+            goalsScored: selection,
             seasonId: 1
           }
         },
         {
           $sort: {
-            [selection]: -1,
+            goalsScored: -1,
           },
         },
         {
@@ -198,7 +198,6 @@ export class TeamService {
     return teams;
   }
 
-
   async getMostScoredAtOfPeriod(seasonId: number, period: number) {
 
     const periods = {
@@ -210,7 +209,7 @@ export class TeamService {
       6: "75-90",
     };
 
-    const selection = 'goalsConcededTiming.'.concat(periods[period]).concat('.count')
+    const selection = '$goalsConcededTiming.'.concat(periods[period]).concat('.count')
 
     const teams = await this.statModel.aggregate(
       [
@@ -223,13 +222,13 @@ export class TeamService {
           $project: {
             _id: 1,
             teamId: 1,
-            [selection]: 1,
+            goalsConceded: selection,
             seasonId: 1
           }
         },
         {
           $sort: {
-            [selection]: -1,
+            goalsConceded: -1,
           },
         },
         {
