@@ -66,15 +66,6 @@ export class PlayerService {
           }
         },
         {
-          $project: {
-            playerId: 1,
-            totalGoals: 1,
-            goals: 1,
-            penalties: 1,
-            seasonId: 1
-          }
-        },
-        {
           $limit: 20
         },
         {
@@ -89,7 +80,48 @@ export class PlayerService {
           $unwind: {
             path: "$player",
           }
-        }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "player.teamId",
+            foreignField: "id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+          }
+        },
+        {
+          $project: {
+            appearances: 1,
+            totalGoals: 1,
+            goals: 1,
+            penalties: 1,
+            'season': '$season.name',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          }
+        },
       ]
     );
     return players
@@ -109,13 +141,6 @@ export class PlayerService {
           }
         },
         {
-          $project: {
-            playerId: 1,
-            assists: 1,
-            seasonId: 1
-          }
-        },
-        {
           $limit: 20
         },
         {
@@ -130,7 +155,46 @@ export class PlayerService {
           $unwind: {
             path: "$player",
           }
-        }
+        },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "player.teamId",
+            foreignField: "id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+          }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            appearances: 1,
+            assists: 1,
+            'season': '$season.name',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          }
+        },
       ]
     );
     return players
@@ -150,13 +214,6 @@ export class PlayerService {
           }
         },
         {
-          $project: {
-            playerId: 1,
-            seasonId: 1,
-            yellowCards: 1,
-          }
-        },
-        {
           $limit: 20
         },
         {
@@ -171,7 +228,45 @@ export class PlayerService {
           $unwind: {
             path: "$player",
           }
-        }
+        },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "player.teamId",
+            foreignField: "id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+          }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            yellowCards: 1,
+            'season': '$season.name',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          }
+        },
       ]
     );
     return players
@@ -186,23 +281,6 @@ export class PlayerService {
           }
         },
         {
-          $project: {
-            playerId: 1,
-            goals: '$totalGoals',
-            assists: 1,
-            seasonId: 1,
-            contributions: { '$add': ['$totalGoals', '$assists'] },
-          }
-        },
-        {
-          $sort: {
-            contributions: -1
-          }
-        },
-        {
-          $limit: 20
-        },
-        {
           $lookup: {
             from: "players",
             localField: "playerId",
@@ -214,8 +292,58 @@ export class PlayerService {
           $unwind: {
             path: "$player",
           }
-        }
-      ]);
+        },
+        {
+          $lookup: {
+            from: "teams",
+            localField: "player.teamId",
+            foreignField: "id",
+            as: "team"
+          }
+        },
+        {
+          $unwind: {
+            path: "$team",
+          }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            appearances: 1,
+            goals: '$totalGoals',
+            assists: 1,
+            contributions: { '$add': ['$totalGoals', '$assists'] },
+            'season': '$season.name',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          }
+        },
+        {
+          $sort: {
+            contributions: -1,
+          }
+        },
+        {
+          $limit: 20
+        },
+      ]
+    );
     return players;
   }
 }
