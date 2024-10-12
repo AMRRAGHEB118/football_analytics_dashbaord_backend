@@ -38,13 +38,6 @@ export class TeamService {
           },
         },
         {
-          $project: {
-            teamId: 1,
-            totalGoalsScored: 1,
-            seasonId: 1
-          }
-        },
-        {
           $sort: {
             totalGoalsScored: -1,
           },
@@ -60,8 +53,31 @@ export class TeamService {
         {
           $unwind: {
             path: "$team",
-            }
+          }
         },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            'team._id': 1,
+            'team.name': 1,
+            'team.imgPath': 1,
+            totalGoalsScored: 1,
+            'season._id': 1,
+            'season.name': 1
+          }
+        }
       ]
     );
 
@@ -75,13 +91,6 @@ export class TeamService {
           $match: {
             seasonId: seasonId,
           },
-        },
-        {
-          $project: {
-            teamId: 1,
-            failedToScore: 1,
-            seasonId: 1
-          }
         },
         {
           $sort: {
@@ -102,7 +111,27 @@ export class TeamService {
           }
         },
         {
-          $limit: 5
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            'team._id': 1,
+            'team.name': 1,
+            'team.imgPath': 1,
+            failedToScore: 1,
+            'season._id': 1,
+            'season.name': 1
+          }
         }
       ]
     );
@@ -119,13 +148,6 @@ export class TeamService {
           },
         },
         {
-          $project: {
-            teamId: 1,
-						ballPossession: 1,
-            seasonId: 1
-          }
-        },
-        {
           $sort: {
             ballPossession: -1,
           },
@@ -138,11 +160,34 @@ export class TeamService {
             as: "team"
           }
         },
-  			{
-    			$unwind: {
-    			  path: "$team",
-    			  }
-  			}
+        {
+          $unwind: {
+            path: "$team",
+          }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            'team._id': 1,
+            'team.name': 1,
+            'team.imgPath': 1,
+            ballPossession: 1,
+            'season._id': 1,
+            'season.name': 1
+          }
+        }
       ]
     );
     return teams;
@@ -168,19 +213,6 @@ export class TeamService {
           },
         },
         {
-          $project: {
-            _id: 1,
-            teamId: 1,
-            goalsScored: selection,
-            seasonId: 1
-          }
-        },
-        {
-          $sort: {
-            goalsScored: -1,
-          },
-        },
-        {
           $lookup: {
             from: "teams",
             localField: "teamId",
@@ -191,8 +223,36 @@ export class TeamService {
         {
           $unwind: {
             path: "$team",
-            }
-        }
+          }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            'team._id': 1,
+            'team.name': 1,
+            'team.imgPath': 1,
+            goalsScored: selection,
+            'season._id': 1,
+            'season.name': 1
+          }
+        },
+        {
+          $sort: {
+            goalsScored: -1,
+          },
+        },
       ]
     );
     return teams;
@@ -219,19 +279,6 @@ export class TeamService {
           },
         },
         {
-          $project: {
-            _id: 1,
-            teamId: 1,
-            goalsConceded: selection,
-            seasonId: 1
-          }
-        },
-        {
-          $sort: {
-            goalsConceded: -1,
-          },
-        },
-        {
           $lookup: {
             from: "teams",
             localField: "teamId",
@@ -242,8 +289,36 @@ export class TeamService {
         {
           $unwind: {
             path: "$team",
-            }
-        }
+          }
+        },
+        {
+          $lookup: {
+            from: "seasons",
+            localField: "seasonId",
+            foreignField: "id",
+            as: "season"
+          }
+        },
+        {
+          $unwind: {
+            path: "$season",
+          }
+        },
+        {
+          $project: {
+            'team._id': 1,
+            'team.name': 1,
+            'team.imgPath': 1,
+            goalsConceded: selection,
+            'season._id': 1,
+            'season.name': 1
+          }
+        },
+        {
+          $sort: {
+            goalsConceded: -1,
+          },
+        },
       ]
     );
     return teams;
