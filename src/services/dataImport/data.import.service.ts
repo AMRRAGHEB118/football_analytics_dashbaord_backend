@@ -68,13 +68,14 @@ export class DataImportService {
 
   async getPlayersData(): Promise<_Response> {
     const apiToken = this.configService.get<string>('API_KEY');
+    const seasons = this.configService.get<string>('SEASONS').split(',');
     try {
       const teams = await this.teamModel.find();
       const result: Player[] = await Promise.all(teams.map(async team => {
         const url = `squads/teams/${team.id}?api_token=${apiToken}` +
-          `&per_page=50&include=player.statistics.details.type` +
-          `;detailedPosition;position` +
-          `&filters=playerstatisticSeasons:18369,19735,21787`;
+        `&per_page=50&include=player.statistics.details.type` +
+        `;detailedPosition;position` +
+        `&filters=playerstatisticSeasons:${seasons}`;
         const response = (await this.axiosService.instance.get(url)).data;
         await Promise.all(response.data.map(async player => {
           const res = await this.dataMapService.mapAndSavePlayerData(player)
