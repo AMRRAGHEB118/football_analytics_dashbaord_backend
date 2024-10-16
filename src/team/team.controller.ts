@@ -4,8 +4,6 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
-  UsePipes,
-  ValidationPipe,
   Res,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
