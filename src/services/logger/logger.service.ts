@@ -26,6 +26,7 @@ export class LoggerService {
     metadata?: Record<string, any>,
     isAutomated?: boolean,
     ipAddress?: string,
+    responseTime?: number
   ): Promise<Logger> {
     return this.createLog(
       message,
@@ -39,6 +40,7 @@ export class LoggerService {
       metadata,
       isAutomated,
       ipAddress,
+      responseTime
     );
   }
 
@@ -53,6 +55,7 @@ export class LoggerService {
     metadata?: Record<string, any>,
     isAutomated?: boolean,
     ipAddress?: string,
+    responseTime?: number
   ): Promise<Logger> {
     return this.createLog(
       message,
@@ -66,6 +69,7 @@ export class LoggerService {
       metadata,
       isAutomated,
       ipAddress,
+      responseTime
     );
   }
 
@@ -81,6 +85,7 @@ export class LoggerService {
     metadata?: Record<string, any>,
     isAutomated?: boolean,
     ipAddress?: string,
+    responseTime?: number,
   ): Promise<Logger> {
     const logEntry = new this.loggerModel({
       message,
@@ -94,6 +99,7 @@ export class LoggerService {
       metadata,
       isAutomated,
       ipAddress,
+      responseTime
     });
     return logEntry.save();
   }
