@@ -33,7 +33,7 @@ export class TeamController {
     try {
       const result = await this.teamService.findOne(id, seasonId);
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
 
       if (!result) {
         this.loggerService.logError(
@@ -93,7 +93,7 @@ export class TeamController {
   ) {
     const s: number = performance.now();
     let duration: number = performance.now() - s;
-    duration = parseInt((duration / 1000).toFixed(2));
+    duration = parseFloat((duration / 1000).toFixed(2));
     const result = await this.teamService.reloadTeam(id);
     if (result.status_code == 200) {
       this.loggerService.logInfo(
@@ -125,7 +125,7 @@ export class TeamController {
       });
     } else {
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
       this.loggerService.logError(
         `Server error happened while reloading Team => ${id}`,
         '/team/:id',
@@ -150,7 +150,7 @@ export class TeamController {
 
     const result = await this.teamService.fetchAllTeams();
     let duration: number = performance.now() - s;
-    duration = parseInt((duration / 1000).toFixed(2));
+    duration = parseFloat((duration / 1000).toFixed(2));
     if (result.status_code == 200) {
       this.loggerService.logInfo(
         `Teams fetched successfully`,
@@ -197,7 +197,7 @@ export class TeamController {
     try {
       const result = await this.teamService.getTopScorerOfSeason(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
 
       if (!result || result.length === 0) {
         this.loggerService.logError(
@@ -230,7 +230,7 @@ export class TeamController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
       this.loggerService.logError(
         `Server Error happened while finding statistics for season: ${seasonId}`,
         'team/statistics/top-of-season/:seasonId',
@@ -262,7 +262,7 @@ export class TeamController {
     try {
       const result = await this.teamService.getMostFailedToScore(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
 
       if (!result || result.length === 0) {
         this.loggerService.logError(
@@ -295,7 +295,7 @@ export class TeamController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
       this.loggerService.logError(
         `Server Error happened while finding statistics for season: ${seasonId}`,
         'team/statistics/failed-to-score/:seasonId',
@@ -326,7 +326,7 @@ export class TeamController {
     try {
       const result = await this.teamService.getMostPossessed(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
 
       if (!result || result.length === 0) {
         this.loggerService.logError(
@@ -359,7 +359,7 @@ export class TeamController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
       this.loggerService.logError(
         `Server Error happened while finding statistics for season: ${seasonId}`,
         'team/statistics/most-possessed/:seasonId',
@@ -398,7 +398,7 @@ export class TeamController {
         period,
       );
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
 
       if (!result || result.length === 0) {
         this.loggerService.logError(
@@ -431,7 +431,7 @@ export class TeamController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
       this.loggerService.logError(
         `Server Error happened while finding statistics for season: ${seasonId}`,
         'team/statistics/score-of-period/:seasonId',
@@ -470,7 +470,7 @@ export class TeamController {
         period,
       );
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
 
       if (!result || result.length === 0) {
         this.loggerService.logError(
@@ -503,7 +503,7 @@ export class TeamController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseInt((duration / 1000).toFixed(2));
+      duration = parseFloat((duration / 1000).toFixed(2));
       this.loggerService.logError(
         `Server Error happened while finding statistics for season: ${seasonId}`,
         'team/statistics/conceded-of-period/:seasonId',
