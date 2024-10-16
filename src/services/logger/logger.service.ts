@@ -21,12 +21,12 @@ export class LoggerService {
     method: string,
     statusCode: number,
     module: LoggerModule,
+    responseTime?: number,
     errorDetails?: string,
     options?: Partial<Logger>,
     metadata?: Record<string, any>,
     isAutomated?: boolean,
     ipAddress?: string,
-    responseTime?: number
   ): Promise<Logger> {
     return this.createLog(
       message,
@@ -50,12 +50,12 @@ export class LoggerService {
     method: string,
     statusCode: number,
     module: LoggerModule,
+    responseTime?: number,
     errorDetails?: string,
     options?: Partial<Logger>,
     metadata?: Record<string, any>,
     isAutomated?: boolean,
     ipAddress?: string,
-    responseTime?: number
   ): Promise<Logger> {
     return this.createLog(
       message,
