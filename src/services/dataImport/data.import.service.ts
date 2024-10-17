@@ -77,8 +77,11 @@ export class DataImportService {
         `;detailedPosition;position` +
         `&filters=playerstatisticSeasons:${seasons}`;
         const response = (await this.axiosService.instance.get(url)).data;
+
         await Promise.all(response.data.map(async player => {
-          const res = await this.dataMapService.mapAndSavePlayerData(player)
+          player.player.detailedPosition = player.detailedPosition;
+          player.player.position = player.position;
+          const res = await this.dataMapService.mapAndSavePlayerData(player.player);
           return res;
         }))
         return response.data
@@ -109,18 +112,13 @@ export class DataImportService {
     for (const season of seasons) {
       try {
         const playerData = await this.getPlayerData(playerId, season);
-        const result = await this.dataMapService.mapAndSavePlayerData(playerData);
+        const result = await this.dataMapService.mapAndSavePlayerData(playerData.data);
         return {
           "err": "",
           "status_code": 200,
           "data": result,
         }
       } catch (error) {
-        this.logger.logError
-          (
-            `Failed to import data for player ${playerId}`,
-            '/player:id', 'GET', 500, LoggerModule.PLAYER, error
-          );
         return {
           "err": error,
           "status_code": 500,

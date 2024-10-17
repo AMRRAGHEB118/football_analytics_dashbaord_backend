@@ -28,24 +28,24 @@ export class DataMapService {
     let player = await this.playerModel.findOne({ id: playerData.id });
     if (!player) {
       player = new this.playerModel({
-        id: playerData.player_id,
-        teamId: playerData.team_id,
-        position: playerData.position.name,
+        id: playerData?.player_id,
+        teamId: playerData?.team_id,
+        position: playerData?.position?.name,
         detailedPosition: playerData?.detailedposition?.name,
-        commonName: playerData.player?.common_name,
-        firstName: playerData.player?.firstname,
-        lastName: playerData.player?.lastname,
-        name: playerData.player?.name,
-        displayName: playerData.player?.display_name,
-        imagePath: playerData.player?.image_path,
-        height: playerData.player?.height,
-        weight: playerData.player?.weight,
-        dateOfBirth: playerData.player?.date_of_birth,
+        commonName: playerData?.common_name,
+        firstName: playerData?.firstname,
+        lastName: playerData?.lastname,
+        name: playerData?.name,
+        displayName: playerData?.display_name,
+        imagePath: playerData?.image_path,
+        height: playerData?.height,
+        weight: playerData?.weight,
+        dateOfBirth: playerData?.date_of_birth,
         statistics: [],
       });
       await player.save();
     }
-    const statisticsData = playerData.player.statistics.map((stat: any) => ({
+    const statisticsData = playerData.statistics.map((stat: any) => ({
       playerId: player._id,
       seasonId: stat.season_id,
       totalGoals:
