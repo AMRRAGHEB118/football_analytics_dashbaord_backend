@@ -258,6 +258,7 @@ export class PlayerController {
           500,
           LoggerModule.PLAYER,
           duration,
+          result.err
         );
         return response.status(500).send({
           message: 'Error happened while reloading the player',
@@ -275,6 +276,7 @@ export class PlayerController {
         500,
         LoggerModule.PLAYER,
         duration,
+        err
       );
       return response.status(500).send({
         message: 'Error happened while reloading the player',
