@@ -11,7 +11,7 @@ import { Response } from 'express';
 import { LoggerService } from 'src/services/logger/logger.service';
 import { LoggerModule } from 'src/services/logger/logger.schema';
 import { Types } from 'mongoose';
-
+import { Player } from './schema/player.schema';
 
 @Controller('players')
 export class PlayerController {
@@ -26,7 +26,7 @@ export class PlayerController {
     try {
       const result = await this.playerService.findAll();
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       if (result.status_code === 200) {
         this.loggerService.logInfo(
           'Players fetched successfully from third party',
@@ -74,7 +74,7 @@ export class PlayerController {
       });
     } catch (err) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Failed to fetch players from third party`,
         '/players',
@@ -93,24 +93,20 @@ export class PlayerController {
   }
 
   @Get(':id')
-  async findOne(
-    @Param() id: Types.ObjectId,
-    @Res() response: Response,
-  ) {
+  async findOne(@Param() id: Types.ObjectId, @Res() response: Response) {
     const s: number = performance.now();
     if (!Types.ObjectId.isValid(id)) {
-      return response.status(406)
-      .send({
+      return response.status(406).send({
         message: 'Invalid parameter (Not a valid objectId)',
         status_code: 406,
         data: [],
       });
     }
-    const _id = new Types.ObjectId(id)
+    const _id = new Types.ObjectId(id);
     try {
       const result = await this.playerService.findOne(_id);
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
 
       if (result.status_code == 200) {
         this.loggerService.logInfo(
@@ -144,7 +140,7 @@ export class PlayerController {
       }
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Server error happened while finding player ${id}`,
         'player/:id',
@@ -156,6 +152,68 @@ export class PlayerController {
       );
       return response.status(500).send({
         message: `Server error happened while finding player ${id}`,
+        status_code: 500,
+        data: [],
+      });
+    }
+  }
+
+  @Get('team/:id')
+  async findTeamPlayers(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @Res() response: Response,
+  ) {
+    const s: number = performance.now();
+    try {
+      const players: Player[] = await this.playerService.getTeamPlayers(id);
+      let duration: number = performance.now() - s;
+      duration = parseFloat(duration.toFixed(2));
+      if (!players || players.length === 0) {
+        this.loggerService.logError(
+          `No players found for team: ${id}`,
+          '/players/team/:id',
+          'GET',
+          404,
+          LoggerModule.PLAYER,
+          duration,
+        );
+        return response.status(404).send({
+          message: 'No players found',
+          status_code: 404,
+          data: [],
+        });
+      }
+      this.loggerService.logInfo(
+        `Team ${id} players retrieved successfully`,
+        '/players/team/:id',
+        'GET',
+        200,
+        LoggerModule.PLAYER,
+        duration,
+      );
+      return response.status(200).send({
+        message: 'Players retrieved successfully',
+        status_code: 200,
+        data: players,
+      });
+    } catch (err) {
+      let duration: number = performance.now() - s;
+      duration = parseFloat(duration.toFixed(2));
+      this.loggerService.logError(
+        `Error happened while finding player for team ${id}`,
+        '/players/team/:id',
+        'GET',
+        500,
+        LoggerModule.PLAYER,
+        duration,
+        err,
+      );
+      return response.status(500).send({
+        message: 'Server error happened',
         status_code: 500,
         data: [],
       });
@@ -175,7 +233,7 @@ export class PlayerController {
     try {
       const result = await this.playerService.reloadPlayer(id);
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
 
       if (result.status_code == 200) {
         this.loggerService.logInfo(
@@ -209,7 +267,7 @@ export class PlayerController {
       }
     } catch (err) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Error happened while reloading player ${id}`,
         'player/reload/:id',
@@ -239,7 +297,7 @@ export class PlayerController {
     try {
       const result = await this.playerService.getTopScorerOfSeason(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       if (result.length === 0) {
         this.loggerService.logError(
           `No statistics found for season: ${seasonId}`,
@@ -271,7 +329,7 @@ export class PlayerController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Error happened for season: ${seasonId}`,
         '/players/statistics/top-score/:seasonId',
@@ -302,7 +360,7 @@ export class PlayerController {
     try {
       const result = await this.playerService.getTopAssistantOfSeason(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       if (result.length === 0) {
         this.loggerService.logError(
           `No statistics found for season: ${seasonId}`,
@@ -334,7 +392,7 @@ export class PlayerController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Error happened for season: ${seasonId}`,
         '/players/statistics/top-assist/:seasonId',
@@ -365,7 +423,7 @@ export class PlayerController {
     try {
       const result = await this.playerService.getTopYellowCard(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       if (result.length === 0) {
         this.loggerService.logError(
           `No statistics found for season: ${seasonId}`,
@@ -397,7 +455,7 @@ export class PlayerController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Error happened for season: ${seasonId}`,
         '/players/statistics/top-yellow-card/:seasonId',
@@ -428,7 +486,7 @@ export class PlayerController {
     try {
       const result = await this.playerService.getTopContributions(seasonId);
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       if (result.length === 0) {
         this.loggerService.logError(
           `No statistics found for season: ${seasonId}`,
@@ -460,7 +518,7 @@ export class PlayerController {
       });
     } catch (error) {
       let duration: number = performance.now() - s;
-      duration = parseFloat((duration).toFixed(2));
+      duration = parseFloat(duration.toFixed(2));
       this.loggerService.logError(
         `Error happened for season: ${seasonId}`,
         '/players/statistics/top-contributions/:seasonId',

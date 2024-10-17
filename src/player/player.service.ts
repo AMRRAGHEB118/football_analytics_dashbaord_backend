@@ -19,7 +19,7 @@ export class PlayerService {
   }
 
   async findOne(id: Types.ObjectId): Promise<any> {
-    const player = await this.playerModel
+    const player: Player = await this.playerModel
       .findById(id)
       .populate('statistics')
       .exec();
@@ -36,6 +36,11 @@ export class PlayerService {
       status_code: 200,
       data: [player],
     };
+  }
+
+  async getTeamPlayers(id: number): Promise<any> {
+    return this.playerModel.find({ teamId: id})
+    .select({ name: 1, _id: 1, position: 1, imagePath: 1 });
   }
 
   async reloadPlayer(id: number): Promise<any> {
