@@ -8,13 +8,8 @@ import { Team } from 'src/team/schema/team.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Player } from 'src/player/schema/player.schema';
+import _Response from '../../types';
 
-
-type _Response = {
-  "err": string,
-  "status_code": number,
-  "data": any,
-}
 
 @Injectable()
 export class DataImportService {
@@ -81,6 +76,7 @@ export class DataImportService {
         await Promise.all(response.data.map(async player => {
           player.player.detailedPosition = player.detailedPosition;
           player.player.position = player.position;
+          player.player.team_id = team.id;
           const res = await this.dataMapService.mapAndSavePlayerData(player.player);
           return res;
         }))
