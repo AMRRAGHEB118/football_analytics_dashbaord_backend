@@ -92,8 +92,16 @@ export class PlayerController {
     }
   }
 
-  @Get(':id')
-  async findOne(@Param() id: Types.ObjectId, @Res() response: Response) {
+  @Get(':id/:seasonId')
+  async findOne(
+    @Param() id: Types.ObjectId,
+    @Param(
+      'seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    seasonId: number,
+    @Res() response: Response,
+  ) {
     const s: number = performance.now();
     if (!Types.ObjectId.isValid(id)) {
       return response.status(406).send({
@@ -104,7 +112,7 @@ export class PlayerController {
     }
     const _id = new Types.ObjectId(id);
     try {
-      const result = await this.playerService.findOne(_id);
+      const result = await this.playerService.findOne(_id, seasonId);
       let duration: number = performance.now() - s;
       duration = parseFloat(duration.toFixed(2));
 
@@ -258,7 +266,7 @@ export class PlayerController {
           500,
           LoggerModule.PLAYER,
           duration,
-          result.err
+          result.err,
         );
         return response.status(500).send({
           message: 'Error happened while reloading the player',
@@ -276,7 +284,7 @@ export class PlayerController {
         500,
         LoggerModule.PLAYER,
         duration,
-        err
+        err,
       );
       return response.status(500).send({
         message: 'Error happened while reloading the player',
