@@ -21,6 +21,7 @@ export class TeamController {
 
   @Get(':id/:seasonId')
   async getTeam(
+    @Param()
     id: Types.ObjectId,
     @Param(
       'seasonId',
@@ -29,9 +30,17 @@ export class TeamController {
     seasonId: number,
     @Res() response: Response,
   ) {
+    if (!Types.ObjectId.isValid) {
+      return response.status(406).send({
+        message: 'Wrong ObjectId',
+        status_code: 406,
+        data: [],
+      });
+    }
+    const _id = new Types.ObjectId(id);
     const s: number = performance.now();
     try {
-      const result = await this.teamService.findOne(id, seasonId);
+      const result = await this.teamService.findOne(_id, seasonId);
       let duration: number = performance.now() - s;
       duration = parseFloat((duration / 1000).toFixed(2));
 
@@ -116,7 +125,7 @@ export class TeamController {
         'GET',
         404,
         LoggerModule.TEAM,
-        duration
+        duration,
       );
       return response.status(404).send({
         message: 'Team not found ,Please make sure of team id',
@@ -271,7 +280,7 @@ export class TeamController {
           'GET',
           404,
           LoggerModule.TEAM,
-          duration
+          duration,
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
@@ -285,7 +294,7 @@ export class TeamController {
         'GET',
         500,
         LoggerModule.TEAM,
-        duration
+        duration,
       );
 
       return response.status(200).send({
@@ -335,7 +344,7 @@ export class TeamController {
           'GET',
           404,
           LoggerModule.TEAM,
-          duration
+          duration,
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
@@ -349,7 +358,7 @@ export class TeamController {
         'GET',
         500,
         LoggerModule.TEAM,
-        duration
+        duration,
       );
 
       return response.status(200).send({
@@ -407,7 +416,7 @@ export class TeamController {
           'GET',
           404,
           LoggerModule.TEAM,
-          duration
+          duration,
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
@@ -421,7 +430,7 @@ export class TeamController {
         'GET',
         500,
         LoggerModule.TEAM,
-        duration
+        duration,
       );
 
       return response.status(200).send({
@@ -479,7 +488,7 @@ export class TeamController {
           'GET',
           404,
           LoggerModule.TEAM,
-          duration
+          duration,
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
@@ -493,7 +502,7 @@ export class TeamController {
         'GET',
         200,
         LoggerModule.TEAM,
-        duration
+        duration,
       );
 
       return response.status(200).send({

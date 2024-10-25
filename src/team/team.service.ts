@@ -17,7 +17,7 @@ export class TeamService {
   ) { }
 
   async findOne(id: Types.ObjectId, seasonId: number) {
-    return await this.teamModel.findOne({ id })
+    return await this.teamModel.findOne({ _id: id })
       .populate({ path: 'statistics', match: { seasonId: seasonId } }).exec();
   }
 
