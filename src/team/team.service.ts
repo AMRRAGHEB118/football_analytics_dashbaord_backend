@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Team } from './schema/team.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { DataImportService } from 'src/services/dataImport/data.import.service';
 import { LoggerService } from 'src/services/logger/logger.service';
 import { TeamStatistics } from './schema/teamStats.schema';
@@ -16,8 +16,8 @@ export class TeamService {
     private readonly loggerService: LoggerService,
   ) { }
 
-  async findOne(id: number, seasonId: number) {
-    return await this.teamModel.findOne({ id })
+  async findOne(id: Types.ObjectId, seasonId: number) {
+    return await this.teamModel.findOne({ _id: id })
       .populate({ path: 'statistics', match: { seasonId: seasonId } }).exec();
   }
 
@@ -70,10 +70,11 @@ export class TeamService {
         },
         {
           $project: {
+            totalGoalsScored: 1,
+            'leagueId': '$season.leagueId',
             'team._id': 1,
             'team.name': 1,
             'team.imgPath': 1,
-            totalGoalsScored: 1,
             'season._id': 1,
             'season.name': 1
           }
@@ -125,10 +126,11 @@ export class TeamService {
         },
         {
           $project: {
+            failedToScore: 1,
+            'leagueId': '$season.leagueId',
             'team._id': 1,
             'team.name': 1,
             'team.imgPath': 1,
-            failedToScore: 1,
             'season._id': 1,
             'season.name': 1
           }
@@ -180,10 +182,11 @@ export class TeamService {
         },
         {
           $project: {
+            ballPossession: 1,
+            'leagueId': '$season.leagueId',
             'team._id': 1,
             'team.name': 1,
             'team.imgPath': 1,
-            ballPossession: 1,
             'season._id': 1,
             'season.name': 1
           }
@@ -240,10 +243,11 @@ export class TeamService {
         },
         {
           $project: {
+            goalsScored: selection,
+            'leagueId': '$season.leagueId',
             'team._id': 1,
             'team.name': 1,
             'team.imgPath': 1,
-            goalsScored: selection,
             'season._id': 1,
             'season.name': 1
           }
@@ -306,10 +310,11 @@ export class TeamService {
         },
         {
           $project: {
+            goalsConceded: selection,
+            'leagueId': '$season.leagueId',
             'team._id': 1,
             'team.name': 1,
             'team.imgPath': 1,
-            goalsConceded: selection,
             'season._id': 1,
             'season.name': 1
           }

@@ -21,6 +21,7 @@ export class LoggerService {
     method: string,
     statusCode: number,
     module: LoggerModule,
+    responseTime?: number,
     errorDetails?: string,
     options?: Partial<Logger>,
     metadata?: Record<string, any>,
@@ -39,6 +40,7 @@ export class LoggerService {
       metadata,
       isAutomated,
       ipAddress,
+      responseTime
     );
   }
 
@@ -48,6 +50,7 @@ export class LoggerService {
     method: string,
     statusCode: number,
     module: LoggerModule,
+    responseTime?: number,
     errorDetails?: string,
     options?: Partial<Logger>,
     metadata?: Record<string, any>,
@@ -66,6 +69,7 @@ export class LoggerService {
       metadata,
       isAutomated,
       ipAddress,
+      responseTime
     );
   }
 
@@ -81,6 +85,7 @@ export class LoggerService {
     metadata?: Record<string, any>,
     isAutomated?: boolean,
     ipAddress?: string,
+    responseTime?: number,
   ): Promise<Logger> {
     const logEntry = new this.loggerModel({
       message,
@@ -94,6 +99,7 @@ export class LoggerService {
       metadata,
       isAutomated,
       ipAddress,
+      responseTime
     });
     return logEntry.save();
   }

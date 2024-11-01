@@ -8,13 +8,8 @@ import { Team } from 'src/team/schema/team.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Player } from 'src/player/schema/player.schema';
+import _Response from '../../types';
 
-
-type _Response = {
-  "err": string,
-  "status_code": number,
-  "data": any,
-}
 
 @Injectable()
 export class DataImportService {
@@ -68,16 +63,21 @@ export class DataImportService {
 
   async getPlayersData(): Promise<_Response> {
     const apiToken = this.configService.get<string>('API_KEY');
+    const seasons = this.configService.get<string>('SEASONS').split(',');
     try {
       const teams = await this.teamModel.find();
       const result: Player[] = await Promise.all(teams.map(async team => {
         const url = `squads/teams/${team.id}?api_token=${apiToken}` +
-          `&per_page=50&include=player.statistics.details.type` +
-          `;detailedPosition;position` +
-          `&filters=playerstatisticSeasons:18369,19735,21787`;
+        `&per_page=50&include=player.statistics.details.type` +
+        `;detailedPosition;position` +
+        `&filters=playerstatisticSeasons:${seasons}`;
         const response = (await this.axiosService.instance.get(url)).data;
+
         await Promise.all(response.data.map(async player => {
-          const res = await this.dataMapService.mapAndSavePlayerData(player)
+          player.player.detailedPosition = player.detailedPosition;
+          player.player.position = player.position;
+          player.player.team_id = team.id;
+          const res = await this.dataMapService.mapAndSavePlayerData(player.player);
           return res;
         }))
         return response.data
@@ -108,18 +108,13 @@ export class DataImportService {
     for (const season of seasons) {
       try {
         const playerData = await this.getPlayerData(playerId, season);
-        const result = await this.dataMapService.mapAndSavePlayerData(playerData);
+        const result = await this.dataMapService.mapAndSavePlayerData(playerData.data);
         return {
           "err": "",
           "status_code": 200,
           "data": result,
         }
       } catch (error) {
-        this.logger.logError
-          (
-            `Failed to import data for player ${playerId}`,
-            '/player:id', 'GET', 500, LoggerModule.PLAYER, error
-          );
         return {
           "err": error,
           "status_code": 500,
