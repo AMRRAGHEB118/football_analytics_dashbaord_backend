@@ -28,7 +28,7 @@ export class DataMapService {
     let player = await this.playerModel.findOne({ id: playerData.id });
     if (!player) {
       player = new this.playerModel({
-        id: playerData?.player_id,
+        id: playerData?.id,
         teamId: playerData?.team_id,
         position: playerData?.position?.name,
         detailedPosition: playerData?.detailedposition?.name,
@@ -88,7 +88,7 @@ export class DataMapService {
       if (existingStat) {
         const updatedStat = await existingStat.updateOne(stat);
         if (!updatedStat) {
-          throw new HttpException('Failed to update player statistics', 400);
+          throw new HttpException('Failed to update player statistics', 500);
         }
 
         await player.updateOne({
@@ -99,7 +99,7 @@ export class DataMapService {
       } else {
         const newStat = await this.statisticsModel.create(stat);
         if (!newStat) {
-          throw new HttpException('Failed to create player statistics', 400);
+          throw new HttpException('Failed to create player statistics', 500);
         }
 
         await player.updateOne({
@@ -109,6 +109,7 @@ export class DataMapService {
         });
       }
     }
+
     return Promise.resolve();
   }
 
