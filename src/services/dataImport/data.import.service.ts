@@ -49,10 +49,6 @@ export class DataImportService {
         "data": response.data
       };
     } catch (error) {
-      this.logger.logError(
-        `Failed to fetch player ${playerId} data for season ${season}`,
-        '/player:id',
-        'GET', 500, LoggerModule.PLAYER, error);
       return {
         "err": error,
         "status_code": 500,
@@ -188,8 +184,8 @@ export class DataImportService {
   }
 
   async fetchSeasons(): Promise<_Response> {
-    const SEASONS = ["2020/2021", "2021/2022", "2022/2023"];
-    const LEAGUE_ID = "501"
+    const SEASONS = ["2020/2021", "2021/2022", "2022/2023", "2023/2024"];
+    const LEAGUE_ID = "501";
     const API_TOKEN = this.configService.get<string>('API_KEY');
     const URL =
       `https://api.sportmonks.com/v3/football/seasons?api_token=` +
