@@ -7,13 +7,15 @@ import { DataImportModule } from 'src/services/dataImport/data.import.module';
 import { PlayerController } from './player.controller';
 import { LoggerModule } from 'src/services/logger/logger.module';
 import { Team, TeamSchema } from 'src/team/schema/team.schema';
+import { Season, SeasonSchema } from 'src/season/schema/season.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Player.name, schema: PlayerSchema },
       { name: Statistics.name, schema: StatisticsSchema },
-      { name: Team.name, schema: TeamSchema}
+      { name: Team.name, schema: TeamSchema },
+      { name: Season.name, schema: SeasonSchema },
     ]),
     DataImportModule,
     LoggerModule,
