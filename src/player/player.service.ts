@@ -7,6 +7,7 @@ import { Statistics } from './schema/statistics.schema';
 import { Types } from 'mongoose';
 import _Response from 'src/types';
 import { Team, TeamDocument } from 'src/team/schema/team.schema';
+import { Season, SeasonDocment } from 'src/season/schema/season.schema';
 
 @Injectable()
 export class PlayerService {
@@ -14,6 +15,7 @@ export class PlayerService {
     @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
     @InjectModel(Statistics.name) private statModel: Model<Statistics>,
     @InjectModel(Team.name) private teamModel: Model<TeamDocument>,
+    @InjectModel(Season.name) private seasonModel: Model<SeasonDocment>,
     private readonly importService: DataImportService,
   ) {}
 
@@ -24,11 +26,29 @@ export class PlayerService {
   async findOne(id: Types.ObjectId, seasonId: number): Promise<_Response> {
     const player = await this.playerModel
       .findOne({ _id: id })
-      .populate({ path: 'statistics', match: { seasonId: seasonId } })
+      .populate({ path: 'statistics', 
+        match: { seasonId: seasonId }
+       })
       .exec();
+
+    let seasons = await this.seasonModel
+      .find({}, { _id: 0, id: 1 })
+      .sort({ name: -1 })
+      .limit(5)
+      .exec();
+
+    seasons = seasons.map((s) => s.id);
 
     const team = await this.teamModel
       .findOne({ id: player.teamId }, { name: 1, imgPath: 1 })
+      .exec();
+
+    const lastFiveSeasons = await this.statModel
+      .find(
+        { playerId: id, seasonId: { $in: seasons } },
+        { totalGoals: 1, assists: 1, seasonId: 1 },
+      )
+      .sort({ seasonId: -1 })
       .exec();
 
     if (!player) {
@@ -41,7 +61,7 @@ export class PlayerService {
     return {
       err: '',
       status_code: 200,
-      data: { player, team },
+      data: { player, team, lastFiveSeasons },
     };
   }
 
@@ -132,219 +152,225 @@ export class PlayerService {
   }
 
   async getTopAssistantOfSeason(seasonId: number) {
-    const players = await this.statModel.aggregate([
-      {
-        $match: {
-          seasonId: seasonId,
+    const players = await this.statModel
+      .aggregate([
+        {
+          $match: {
+            seasonId: seasonId,
+          },
         },
-      },
-      {
-        $sort: {
-          assists: -1,
+        {
+          $sort: {
+            assists: -1,
+          },
         },
-      },
-      {
-        $limit: 20,
-      },
-      {
-        $lookup: {
-          from: 'players',
-          localField: 'playerId',
-          foreignField: '_id',
-          as: 'player',
+        {
+          $limit: 20,
         },
-      },
-      {
-        $unwind: {
-          path: '$player',
+        {
+          $lookup: {
+            from: 'players',
+            localField: 'playerId',
+            foreignField: '_id',
+            as: 'player',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'teams',
-          localField: 'player.teamId',
-          foreignField: 'id',
-          as: 'team',
+        {
+          $unwind: {
+            path: '$player',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$team',
+        {
+          $lookup: {
+            from: 'teams',
+            localField: 'player.teamId',
+            foreignField: 'id',
+            as: 'team',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'seasons',
-          localField: 'seasonId',
-          foreignField: 'id',
-          as: 'season',
+        {
+          $unwind: {
+            path: '$team',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$season',
+        {
+          $lookup: {
+            from: 'seasons',
+            localField: 'seasonId',
+            foreignField: 'id',
+            as: 'season',
+          },
         },
-      },
-      {
-        $project: {
-          appearances: 1,
-          assists: 1,
-          season: '$season.name',
-          leagueId: '$season.leagueId',
-          'player._id': 1,
-          'player.name': 1,
-          'player.detailedPosition': 1,
-          'player.team._id': '$team._id',
-          'player.team.name': '$team.name',
-          'player.team.imgPath': '$team.imgPath',
+        {
+          $unwind: {
+            path: '$season',
+          },
         },
-      },
-    ]).exec();
+        {
+          $project: {
+            appearances: 1,
+            assists: 1,
+            season: '$season.name',
+            leagueId: '$season.leagueId',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          },
+        },
+      ])
+      .exec();
     return players;
   }
 
   async getTopYellowCard(seasonId: number) {
-    const players = await this.statModel.aggregate([
-      {
-        $match: {
-          seasonId: seasonId,
+    const players = await this.statModel
+      .aggregate([
+        {
+          $match: {
+            seasonId: seasonId,
+          },
         },
-      },
-      {
-        $sort: {
-          yellowCards: -1,
+        {
+          $sort: {
+            yellowCards: -1,
+          },
         },
-      },
-      {
-        $limit: 20,
-      },
-      {
-        $lookup: {
-          from: 'players',
-          localField: 'playerId',
-          foreignField: '_id',
-          as: 'player',
+        {
+          $limit: 20,
         },
-      },
-      {
-        $unwind: {
-          path: '$player',
+        {
+          $lookup: {
+            from: 'players',
+            localField: 'playerId',
+            foreignField: '_id',
+            as: 'player',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'teams',
-          localField: 'player.teamId',
-          foreignField: 'id',
-          as: 'team',
+        {
+          $unwind: {
+            path: '$player',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$team',
+        {
+          $lookup: {
+            from: 'teams',
+            localField: 'player.teamId',
+            foreignField: 'id',
+            as: 'team',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'seasons',
-          localField: 'seasonId',
-          foreignField: 'id',
-          as: 'season',
+        {
+          $unwind: {
+            path: '$team',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$season',
+        {
+          $lookup: {
+            from: 'seasons',
+            localField: 'seasonId',
+            foreignField: 'id',
+            as: 'season',
+          },
         },
-      },
-      {
-        $project: {
-          yellowCards: 1,
-          season: '$season.name',
-          leagueId: '$season.leagueId',
-          'player._id': 1,
-          'player.name': 1,
-          'player.detailedPosition': 1,
-          'player.team._id': '$team._id',
-          'player.team.name': '$team.name',
-          'player.team.imgPath': '$team.imgPath',
+        {
+          $unwind: {
+            path: '$season',
+          },
         },
-      },
-    ]).exec();
+        {
+          $project: {
+            yellowCards: 1,
+            season: '$season.name',
+            leagueId: '$season.leagueId',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          },
+        },
+      ])
+      .exec();
     return players;
   }
 
   async getTopContributions(seasonId: number) {
-    const players = await this.statModel.aggregate([
-      {
-        $match: {
-          seasonId: seasonId,
+    const players = await this.statModel
+      .aggregate([
+        {
+          $match: {
+            seasonId: seasonId,
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'players',
-          localField: 'playerId',
-          foreignField: '_id',
-          as: 'player',
+        {
+          $lookup: {
+            from: 'players',
+            localField: 'playerId',
+            foreignField: '_id',
+            as: 'player',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$player',
+        {
+          $unwind: {
+            path: '$player',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'teams',
-          localField: 'player.teamId',
-          foreignField: 'id',
-          as: 'team',
+        {
+          $lookup: {
+            from: 'teams',
+            localField: 'player.teamId',
+            foreignField: 'id',
+            as: 'team',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$team',
+        {
+          $unwind: {
+            path: '$team',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'seasons',
-          localField: 'seasonId',
-          foreignField: 'id',
-          as: 'season',
+        {
+          $lookup: {
+            from: 'seasons',
+            localField: 'seasonId',
+            foreignField: 'id',
+            as: 'season',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$season',
+        {
+          $unwind: {
+            path: '$season',
+          },
         },
-      },
-      {
-        $project: {
-          appearances: 1,
-          goals: '$totalGoals',
-          assists: 1,
-          contributions: { $add: ['$totalGoals', '$assists'] },
-          season: '$season.name',
-          leagueId: '$season.leagueId',
-          'player._id': 1,
-          'player.name': 1,
-          'player.detailedPosition': 1,
-          'player.team._id': '$team._id',
-          'player.team.name': '$team.name',
-          'player.team.imgPath': '$team.imgPath',
+        {
+          $project: {
+            appearances: 1,
+            goals: '$totalGoals',
+            assists: 1,
+            contributions: { $add: ['$totalGoals', '$assists'] },
+            season: '$season.name',
+            leagueId: '$season.leagueId',
+            'player._id': 1,
+            'player.name': 1,
+            'player.detailedPosition': 1,
+            'player.team._id': '$team._id',
+            'player.team.name': '$team.name',
+            'player.team.imgPath': '$team.imgPath',
+          },
         },
-      },
-      {
-        $sort: {
-          contributions: -1,
+        {
+          $sort: {
+            contributions: -1,
+          },
         },
-      },
-      {
-        $limit: 20,
-      },
-    ]).exec();
+        {
+          $limit: 20,
+        },
+      ])
+      .exec();
     return players;
   }
 }

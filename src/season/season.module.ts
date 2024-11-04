@@ -4,11 +4,15 @@ import { Season, SeasonSchema } from './schema/season.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SeasonService } from './season.service';
 import { DataImportModule } from 'src/services/dataImport/data.import.module';
-
+import { LoggerModule } from 'src/services/logger/logger.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Season.name, schema: SeasonSchema }]), DataImportModule],
+  imports: [
+    MongooseModule.forFeature([{ name: Season.name, schema: SeasonSchema }]),
+    DataImportModule,
+    LoggerModule,
+  ],
   controllers: [SeasonController],
-  providers: [SeasonService]
+  providers: [SeasonService],
 })
 export class SeasonModule {}

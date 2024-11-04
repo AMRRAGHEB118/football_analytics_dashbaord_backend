@@ -92,80 +92,6 @@ export class PlayerController {
     }
   }
 
-  @Get(':id/:seasonId')
-  async findOne(
-    @Param() id: Types.ObjectId,
-    @Param(
-      'seasonId',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    seasonId: number,
-    @Res() response: Response,
-  ) {
-    const s: number = performance.now();
-    if (!Types.ObjectId.isValid(id)) {
-      return response.status(406).send({
-        message: 'Invalid parameter (Not a valid objectId)',
-        status_code: 406,
-        data: [],
-      });
-    }
-    const _id = new Types.ObjectId(id);
-    try {
-      const result = await this.playerService.findOne(_id, seasonId);
-      let duration: number = performance.now() - s;
-      duration = parseFloat(duration.toFixed(2));
-
-      if (result.status_code == 200) {
-        this.loggerService.logInfo(
-          `Found player ${_id} successfully`,
-          'player/:id',
-          'GET',
-          200,
-          LoggerModule.PLAYER,
-          duration,
-        );
-        return response.status(200).send({
-          message: 'Player found successfully.',
-          status_code: 200,
-          data: [result.data],
-        });
-      }
-      if (result.status_code == 404) {
-        this.loggerService.logError(
-          `Can't find player ${_id}`,
-          'player/:id',
-          'GET',
-          404,
-          LoggerModule.PLAYER,
-          duration,
-        );
-        return response.status(404).send({
-          message: 'Player not found',
-          status_code: 404,
-          data: [],
-        });
-      }
-    } catch (error) {
-      let duration: number = performance.now() - s;
-      duration = parseFloat(duration.toFixed(2));
-      this.loggerService.logError(
-        `Server error happened while finding player ${id}`,
-        'player/:id',
-        'GET',
-        500,
-        LoggerModule.PLAYER,
-        duration,
-        error,
-      );
-      return response.status(500).send({
-        message: `Server error happened while finding player ${id}`,
-        status_code: 500,
-        data: [],
-      });
-    }
-  }
-
   @Get('team/:id')
   async findTeamPlayers(
     @Param(
@@ -540,6 +466,80 @@ export class PlayerController {
       );
       return response.status(500).send({
         message: 'Server error happened',
+        status_code: 500,
+        data: [],
+      });
+    }
+  }
+
+  @Get(':id/:seasonId')
+  async findOne(
+    @Param() id: Types.ObjectId,
+    @Param(
+      'seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    seasonId: number,
+    @Res() response: Response,
+  ) {
+    const s: number = performance.now();
+    if (!Types.ObjectId.isValid(id)) {
+      return response.status(406).send({
+        message: 'Invalid parameter (Not a valid objectId)',
+        status_code: 406,
+        data: [],
+      });
+    }
+    const _id = new Types.ObjectId(id);
+    try {
+      const result = await this.playerService.findOne(_id, seasonId);
+      let duration: number = performance.now() - s;
+      duration = parseFloat(duration.toFixed(2));
+
+      if (result.status_code == 200) {
+        this.loggerService.logInfo(
+          `Found player ${_id} successfully`,
+          'player/:id',
+          'GET',
+          200,
+          LoggerModule.PLAYER,
+          duration,
+        );
+        return response.status(200).send({
+          message: 'Player found successfully.',
+          status_code: 200,
+          data: [result.data],
+        });
+      }
+      if (result.status_code == 404) {
+        this.loggerService.logError(
+          `Can't find player ${_id}`,
+          'player/:id',
+          'GET',
+          404,
+          LoggerModule.PLAYER,
+          duration,
+        );
+        return response.status(404).send({
+          message: 'Player not found',
+          status_code: 404,
+          data: [],
+        });
+      }
+    } catch (error) {
+      let duration: number = performance.now() - s;
+      duration = parseFloat(duration.toFixed(2));
+      this.loggerService.logError(
+        `Server error happened while finding player ${id}`,
+        'player/:id',
+        'GET',
+        500,
+        LoggerModule.PLAYER,
+        duration,
+        error,
+      );
+      return response.status(500).send({
+        message: `Server error happened while finding player ${id}`,
         status_code: 500,
         data: [],
       });
