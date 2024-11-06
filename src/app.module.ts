@@ -8,6 +8,7 @@ import { ContactUsModule } from './contact_us/contact_us.module';
 import { APP_PIPE } from '@nestjs/core';
 import { TeamModule } from './team/team.module';
 import { SeasonModule } from './season/season.module';
+import { LeagueModule } from './league/league.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { SeasonModule } from './season/season.module';
     DataMapModule,
     ContactUsModule,
     TeamModule,
-    SeasonModule
+    SeasonModule,
+    LeagueModule
   ],
   providers: [
     {
