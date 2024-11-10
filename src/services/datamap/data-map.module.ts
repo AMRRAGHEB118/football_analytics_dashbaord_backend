@@ -9,6 +9,7 @@ import {
 import { Team, TeamSchema } from 'src/team/schema/team.schema';
 import { TeamStatistics, TeamStatSchema } from 'src/team/schema/teamStats.schema';
 import { Season, SeasonSchema } from 'src/season/schema/season.schema';
+import { League, LeagueSchema } from 'src/league/schema/league.schema';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { Season, SeasonSchema } from 'src/season/schema/season.schema';
       { name: Statistics.name, schema: StatisticsSchema },
       { name: Team.name, schema: TeamSchema},
       { name: TeamStatistics.name, schema: TeamStatSchema},
-      { name: Season.name, schema: SeasonSchema}
+      { name: Season.name, schema: SeasonSchema},
+      { name: League.name, schema: LeagueSchema}
     ]),
   ],
   providers: [DataMapService],
