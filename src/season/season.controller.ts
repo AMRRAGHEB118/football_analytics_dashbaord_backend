@@ -1,4 +1,11 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Res,
+} from '@nestjs/common';
 import { SeasonService } from './season.service';
 import { Response } from 'express';
 import { LoggerService } from 'src/services/logger/logger.service';
@@ -12,10 +19,17 @@ export class SeasonController {
     private readonly loggerService: LoggerService,
   ) {}
 
-  @Get('fetch')
-  async fetchSeasons(@Res() response: Response) {
+  @Get('fetch/:id')
+  async fetchSeason(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @Res() response: Response,
+  ) {
     const s: number = performance.now();
-    const result: _Response = await this.seasonService.fetchSeasons();
+    const result: _Response = await this.seasonService.fetchSeason(id);
     let duration: number = performance.now() - s;
     duration = parseFloat(duration.toFixed(2));
     if (result.status_code == 200) {
@@ -41,6 +55,7 @@ export class SeasonController {
       500,
       LoggerModule.SEASON,
       duration,
+      result.err
     );
     return response.status(500).send({
       message: 'Failed to fetch seasons, try again later.',
@@ -94,7 +109,7 @@ export class SeasonController {
         500,
         LoggerModule.SEASON,
         duration,
-        error
+        error,
       );
       return response.status(500).send({
         message: 'Failed to get seasons.',
