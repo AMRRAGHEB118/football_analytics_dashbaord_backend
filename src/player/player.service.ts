@@ -67,7 +67,7 @@ export class PlayerService {
 
   async getTeamPlayers(id: number): Promise<any> {
     return this.playerModel
-      .find({ teamId: id }, { name: 1, _id: 1, position: 1, imagePath: 1 })
+      .find({ teamId: id }, { commonName: 1, _id: 1, position: 1, imagePath: 1 })
       .exec();
   }
 
