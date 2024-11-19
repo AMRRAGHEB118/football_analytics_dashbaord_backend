@@ -11,7 +11,6 @@ import { Response } from 'express';
 import { LoggerService } from 'src/services/logger/logger.service';
 import { LoggerModule } from 'src/services/logger/logger.schema';
 import { Types } from 'mongoose';
-import { Player } from './schema/player.schema';
 
 @Controller('players')
 export class PlayerController {
@@ -103,10 +102,10 @@ export class PlayerController {
   ) {
     const s: number = performance.now();
     try {
-      const players: Player[] = await this.playerService.getTeamPlayers(id);
+      const result: any = await this.playerService.getTeamPlayers(id);
       let duration: number = performance.now() - s;
       duration = parseFloat(duration.toFixed(2));
-      if (!players || players.length === 0) {
+      if (!result.players || result.players.length === 0) {
         this.loggerService.logError(
           `No players found for team: ${id}`,
           '/players/team/:id',
@@ -132,7 +131,7 @@ export class PlayerController {
       return response.status(200).send({
         message: 'Players retrieved successfully',
         status_code: 200,
-        data: players,
+        data: result,
       });
     } catch (err) {
       let duration: number = performance.now() - s;
