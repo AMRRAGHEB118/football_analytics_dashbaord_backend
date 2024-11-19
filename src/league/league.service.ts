@@ -14,4 +14,11 @@ export class LeagueService {
       .find({}, { _id: 1, id: 1, imagePath: 1, name: 1 })
       .exec();
   }
+
+  async getLeague(id: number) {
+    return this.leagueModel.find(
+      { id },
+      { _id: 1, id: 1, name: 1, imagePath: 1 },
+    );
+  }
 }
