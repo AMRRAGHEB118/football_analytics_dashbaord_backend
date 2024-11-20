@@ -9,6 +9,8 @@ import { APP_PIPE } from '@nestjs/core';
 import { TeamModule } from './team/team.module';
 import { SeasonModule } from './season/season.module';
 import { LeagueModule } from './league/league.module';
+import { AuthModule } from './auth/auth.module';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -22,13 +24,15 @@ import { LeagueModule } from './league/league.module';
     ContactUsModule,
     TeamModule,
     SeasonModule,
-    LeagueModule
+    LeagueModule,
+    AuthModule,
   ],
   providers: [
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
+    AppService,
   ],
 })
 export class AppModule {}
