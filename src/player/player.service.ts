@@ -26,9 +26,7 @@ export class PlayerService {
   async findOne(id: Types.ObjectId, seasonId: number): Promise<_Response> {
     const player = await this.playerModel
       .findOne({ _id: id })
-      .populate({ path: 'statistics', 
-        match: { seasonId: seasonId }
-       })
+      .populate({ path: 'statistics', match: { seasonId: seasonId } })
       .exec();
 
     let seasons = await this.seasonModel
@@ -66,9 +64,21 @@ export class PlayerService {
   }
 
   async getTeamPlayers(id: number): Promise<any> {
-    return this.playerModel
-      .find({ teamId: id }, { name: 1, _id: 1, position: 1, imagePath: 1 })
+    const players = await this.playerModel
+      .find(
+        { teamId: id },
+        { commonName: 1, _id: 1, position: 1, imagePath: 1, teamId: 1 },
+      )
       .exec();
+
+    const team = await this.teamModel
+      .findOne({ id: players[0].teamId }, { _id: 1, id: 1, name: 1, imgPath: 1 })
+      .exec();
+
+    return {
+      players,
+      team,
+    };
   }
 
   async reloadPlayer(id: number): Promise<any> {

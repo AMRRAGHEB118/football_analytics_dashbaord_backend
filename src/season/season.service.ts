@@ -12,8 +12,8 @@ export class SeasonService {
     @InjectModel(Season.name) private seasonModel: Model<SeasonDocment>,
   ) {}
 
-  async fetchSeasons(): Promise<_Response> {
-    return this.dataImport.fetchSeasons();
+  async fetchSeason(id: number): Promise<_Response> {
+    return this.dataImport.fetchSeason(id);
   }
 
   async getSeasons(): Promise<object> {

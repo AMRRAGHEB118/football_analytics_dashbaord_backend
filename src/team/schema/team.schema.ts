@@ -15,6 +15,9 @@ export class Team {
 
   @Prop()
   imgPath: string;
+  
+  @Prop()
+  leagueId: string;
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'TeamStatistics' }],
