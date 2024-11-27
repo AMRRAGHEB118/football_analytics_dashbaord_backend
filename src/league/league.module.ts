@@ -4,6 +4,7 @@ import { LeagueController } from './league.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { League, LeagueSchema } from './schema/league.schema';
 import { LoggerModule } from 'src/services/logger/logger.module';
+import { AxiosService } from 'src/services/axios/axios.service';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { LoggerModule } from 'src/services/logger/logger.module';
     LoggerModule
   ],
   controllers: [LeagueController],
-  providers: [LeagueService],
+  providers: [LeagueService, AxiosService],
 })
 export class LeagueModule {}
