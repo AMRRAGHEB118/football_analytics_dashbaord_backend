@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'football-analytics-dashbaord-backend'
+app = 'football-analytics-dashboard-backend'
 primary_region = 'cdg'
 
 [build]
