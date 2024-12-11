@@ -11,6 +11,8 @@ import { SeasonModule } from './season/season.module';
 import { LeagueModule } from './league/league.module';
 import { AuthModule } from './auth/auth.module';
 import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { AppService } from './app.service';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),
+    ScheduleModule.forRoot(),
     AxiosModule,
     PlayerModule,
     DataMapModule,
@@ -26,6 +29,7 @@ import { AppService } from './app.service';
     SeasonModule,
     LeagueModule,
     AuthModule,
+    NewsModule,
   ],
   providers: [
     {
