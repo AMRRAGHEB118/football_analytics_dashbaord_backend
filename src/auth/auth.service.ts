@@ -5,6 +5,7 @@ import { User, UserDocment } from './schema/user.schema';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -14,12 +15,16 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validate(input: UserData): Promise<UserDocment> {
+  private async getSalt() {
+    return bcrypt.genSalt();
+  }
+
+  async validate(input: UserData): Promise<UserDocment> | null {
     const result = await this.userModel.findOne({
       account: input.account,
-      password: input.password,
     });
-    return result;
+    const isMatch = await bcrypt.compare(input.password, result.password);
+    return isMatch ? result : null;
   }
 
   async signIn(input: UserData): Promise<string | null> {
@@ -35,7 +40,8 @@ export class AuthService {
 
   async checkAdminAccount(): Promise<null> {
     const account = this.configService.get<string>('ADMIN_ACCOUNT');
-    const password = this.configService.get<string>('ADMIN_PASSWORD');
+    let password = this.configService.get<string>('ADMIN_PASSWORD');
+    password = await this.hash_password(password);
     const result = await this.userModel.findOne({ account });
     if (!result) {
       this.userModel.create({
@@ -44,5 +50,11 @@ export class AuthService {
       });
     }
     return null;
+  }
+
+  private async hash_password(password: string): Promise<string> {
+    const salt = await this.getSalt();
+    const hash = await bcrypt.hash(password, salt);
+    return hash
   }
 }
