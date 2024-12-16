@@ -23,7 +23,7 @@ export class AuthService {
     const result = await this.userModel.findOne({
       account: input.account,
     });
-    const isMatch = await bcrypt.compare(input.password, result.password);
+    const isMatch = await bcrypt.compare(input?.password || '', result?.password || '');
     return isMatch ? result : null;
   }
 
