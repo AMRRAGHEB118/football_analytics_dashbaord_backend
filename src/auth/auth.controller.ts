@@ -82,7 +82,7 @@ export class AuthController {
     } catch (error) {
       this.loggerService.logError(
         `Server Error happened while creating the admin account!`,
-        '/auth/checj-admin',
+        '/auth/create-admin',
         'POST',
         500,
         LoggerModule.AUTH,

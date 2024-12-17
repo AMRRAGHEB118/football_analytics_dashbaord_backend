@@ -10,7 +10,8 @@ export enum LoggerModule {
   CONTACT_US = 'contact_us',
   USER = 'user',
   SEASON = 'season',
-  AUTH = 'auth'
+  AUTH = 'auth',
+  NEWS = 'news'
 }
 
 export enum LoggerType {

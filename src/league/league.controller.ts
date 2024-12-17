@@ -1,18 +1,41 @@
-import { Controller, Get, HttpStatus, Param, ParseIntPipe, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Res,
+} from '@nestjs/common';
 import { LeagueService } from './league.service';
+import { AxiosService } from '../services/axios/axios.service';
 import { Response } from 'express';
 import { LoggerService } from 'src/services/logger/logger.service';
 import { LoggerModule } from 'src/services/logger/logger.schema';
+
+type ResponseObj = {
+  message: string;
+  status_code: number;
+  data: any[];
+};
+
+export type MainStats = {
+  topPlayersScored: ResponseObj;
+  topPlayersAssisted: ResponseObj;
+  topTeamsPossessed: ResponseObj;
+  topTeamsScored: ResponseObj;
+  mostFailedToScore: ResponseObj;
+};
 
 @Controller('league')
 export class LeagueController {
   constructor(
     private readonly leagueService: LeagueService,
     private readonly loggerService: LoggerService,
+    private readonly axiosService: AxiosService,
   ) {}
 
   @Get()
-  async listLeagues(@Res() response: Response) {
+  async listLeagues(@Res() response: Response): Promise<Response> {
     const s: number = performance.now();
     try {
       const result = await this.leagueService.listLeagues();
@@ -46,7 +69,7 @@ export class LeagueController {
       return response.status(200).send({
         message: 'leagues retrieved successfully',
         status_code: 200,
-        data: result
+        data: result,
       });
     } catch (err) {
       let duration: number = performance.now() - s;
@@ -75,7 +98,8 @@ export class LeagueController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-    @Res() response: Response) {
+    @Res() response: Response,
+  ): Promise<Response> {
     const s: number = performance.now();
     try {
       const result = await this.leagueService.getLeague(id);
@@ -109,7 +133,7 @@ export class LeagueController {
       return response.status(200).send({
         message: 'league retrieved successfully',
         status_code: 200,
-        data: result
+        data: result,
       });
     } catch (err) {
       let duration: number = performance.now() - s;
@@ -125,6 +149,52 @@ export class LeagueController {
       );
       return response.status(500).send({
         message: 'Server Error happened',
+        status_code: 500,
+        data: [],
+      });
+    }
+  }
+
+  @Get('/statistics/:seasonId')
+  async getMainStats(
+    @Param(
+      'seasonId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    seasonId: number,
+    @Res() response: Response,
+  ): Promise<Response> {
+    const s: number = performance.now();
+    try {
+      const stats: MainStats = await this.leagueService.getLeagueStats(seasonId);
+      let duration: number = performance.now() - s;
+      duration = parseFloat(duration.toFixed(2));
+      this.loggerService.logInfo(
+        'League stats retrieved successfully',
+        '/league/:seasonId',
+        'GET',
+        200,
+        LoggerModule.LEAGUE,
+        duration,
+      );
+      return response.status(200).send({
+        message: 'League statistics retrieved successfully!',
+        status_code: 200,
+        data: [stats],
+      });
+    } catch (error) {
+      let duration: number = performance.now() - s;
+      duration = parseFloat(duration.toFixed(2));
+      this.loggerService.logError(
+        'Server Error happened while retrieving statistics',
+        '/league/:seasonId',
+        'GET',
+        500,
+        LoggerModule.LEAGUE,
+        duration,
+      );
+      return response.status(500).send({
+        message: 'Error happened while retrieving statistics',
         status_code: 500,
         data: [],
       });

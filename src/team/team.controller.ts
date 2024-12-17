@@ -280,7 +280,7 @@ export class TeamController {
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
-          status: 404,
+          status_code: 404,
           data: [],
         });
       }
@@ -295,7 +295,7 @@ export class TeamController {
 
       return response.status(200).send({
         message: 'Top socorer teams retrieved successfully',
-        status: 200,
+        status_code: 200,
         data: result,
       });
     } catch (error) {
@@ -312,7 +312,7 @@ export class TeamController {
       );
       return response.status(500).send({
         message: 'Server Error happened',
-        status: 500,
+        status_code: 500,
         data: [],
       });
     }
@@ -345,7 +345,7 @@ export class TeamController {
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
-          status: 404,
+          status_code: 404,
           data: [],
         });
       }
@@ -360,7 +360,7 @@ export class TeamController {
 
       return response.status(200).send({
         message: 'Failed to score teams retrieved successfully',
-        status: 200,
+        status_code: 200,
         data: result,
       });
     } catch (error) {
@@ -377,7 +377,7 @@ export class TeamController {
       );
       return response.status(500).send({
         message: 'Server Error happened',
-        status: 500,
+        status_code: 500,
         data: [],
       });
     }
@@ -409,7 +409,7 @@ export class TeamController {
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
-          status: 404,
+          status_code: 404,
           data: [],
         });
       }
@@ -424,7 +424,7 @@ export class TeamController {
 
       return response.status(200).send({
         message: 'Most possessed teams retrieved successfully',
-        status: 200,
+        status_code: 200,
         data: result,
       });
     } catch (error) {
@@ -441,7 +441,7 @@ export class TeamController {
       );
       return response.status(500).send({
         message: 'Server Error happened',
-        status: 500,
+        status_code: 500,
         data: [],
       });
     }
@@ -481,7 +481,7 @@ export class TeamController {
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
-          status: 404,
+          status_code: 404,
           data: [],
         });
       }
@@ -496,7 +496,7 @@ export class TeamController {
 
       return response.status(200).send({
         message: 'Scoring periods of teams retrieved successfully',
-        status: 200,
+        status_code: 200,
         data: result,
       });
     } catch (error) {
@@ -513,7 +513,7 @@ export class TeamController {
       );
       return response.status(500).send({
         message: 'Server Error happened',
-        status: 500,
+        status_code: 500,
         data: [],
       });
     }
@@ -553,7 +553,7 @@ export class TeamController {
         );
         return response.status(404).send({
           message: 'No statistics found for this season!',
-          status: 404,
+          status_code: 404,
           data: [],
         });
       }
@@ -568,7 +568,7 @@ export class TeamController {
 
       return response.status(200).send({
         message: 'Goals conceded periods of teams retrieved successfully',
-        status: 200,
+        status_code: 200,
         data: result,
       });
     } catch (error) {
@@ -585,7 +585,7 @@ export class TeamController {
       );
       return response.status(500).send({
         message: 'Server Error happened',
-        status: 500,
+        status_code: 500,
         data: [],
       });
     }
